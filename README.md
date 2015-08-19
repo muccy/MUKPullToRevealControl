@@ -13,7 +13,7 @@ It could be subclassed to achieve a pull to refresh control: `MUKCirclePullToRef
 ## Usage
 
 ````objective-c
-MUKPullToRevealControl *const pullToRevealControl = [[MUKPullToRevealControl alloc] init];
+MUKPullToRevealControl *pullToRevealControl = [[MUKPullToRevealControl alloc] init];
 [pullToRevealControl addTarget:self action:@selector(pullToRevealControlTriggered:) forControlEvents:UIControlEventValueChanged];
 [scrollView addSubview:pullToRevealControl];
 ````
