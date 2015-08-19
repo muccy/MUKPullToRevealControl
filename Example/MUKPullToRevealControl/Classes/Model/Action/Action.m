@@ -60,6 +60,12 @@
     }];
     [actions addObject:action];
     
+    action = [[Action alloc] initWithTitle:@"Reveal-cover quickly" action:^{
+        [pullToRevealControl revealAnimated:YES];
+        [pullToRevealControl coverAnimated:YES];
+    }];
+    [actions addObject:action];
+    
     action = [[Action alloc] initWithTitle:@"Show navigation bar" action:^{
         [navigationController setNavigationBarHidden:NO animated:YES];
     }];
