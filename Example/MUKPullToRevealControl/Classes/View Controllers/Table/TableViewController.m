@@ -21,10 +21,18 @@
     [super viewDidLoad];
     
     MUKPullToRevealControl *const pullToRevealControl = [[MUKCirclePullToRefreshControl alloc] init];
+    [pullToRevealControl addTarget:self action:@selector(pullToRevealControlTriggered:) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:pullToRevealControl];
     
     self.emptyRows = 100;
     self.actions = [Action standardSetWithPullToRevealView:pullToRevealControl navigationController:self.navigationController];
+}
+
+- (void)pullToRevealControlTriggered:(MUKPullToRevealControl *)pullToRevealControl
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [pullToRevealControl coverAnimated:YES];
+    });
 }
 
 #pragma mark - Table
