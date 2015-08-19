@@ -10,6 +10,8 @@
 #import "MUKCirclePullToRefreshControl.h"
 #import "Action.h"
 
+#define DEBUG_FAST_COVER    0
+
 @interface TableViewController ()
 @property (nonatomic, copy) NSArray *actions;
 @property (nonatomic) NSUInteger emptyRows;
@@ -30,9 +32,11 @@
 
 - (void)pullToRevealControlTriggered:(MUKPullToRevealControl *)pullToRevealControl
 {
+#if DEBUG_FAST_COVER
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [pullToRevealControl coverAnimated:YES];
     });
+#endif
 }
 
 #pragma mark - Table
