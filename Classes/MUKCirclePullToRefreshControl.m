@@ -1,5 +1,4 @@
 #import "MUKCirclePullToRefreshControl.h"
-#import <KVOController/FBKVOController.h>
 
 @interface MUKCirclePullToRefreshControlCircleView : UIView
 @property (nonatomic) float filledFraction;
@@ -14,9 +13,7 @@
         layer.fillColor = [UIColor clearColor].CGColor;
         layer.lineWidth = 2.0f;
         layer.strokeColor = self.tintColor.CGColor;
-        layer.strokeEnd = 0.0f;
-        
-        [self observeFilledFraction];
+        layer.strokeEnd = 0.0f; // because _filledFraction = 0
     }
     
     return self;
@@ -44,12 +41,13 @@
     }
 }
 
-- (void)observeFilledFraction {
-    [self.KVOController observe:self keyPath:NSStringFromSelector(@selector(filledFraction)) options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew block:^(MUKCirclePullToRefreshControlCircleView *observer, MUKCirclePullToRefreshControlCircleView *object, NSDictionary *change)
-    {
-        CAShapeLayer *const layer = (CAShapeLayer *)observer.layer;
-        layer.strokeEnd = observer.filledFraction;
-    }];
+- (void)setFilledFraction:(float)filledFraction {
+    if (filledFraction != _filledFraction) {
+        _filledFraction = filledFraction;
+        
+        CAShapeLayer *const layer = (CAShapeLayer *)self.layer;
+        layer.strokeEnd = filledFraction;
+    }
 }
 
 @end
@@ -79,6 +77,13 @@
     }
     
     return self;
+}
+
+#pragma mark - Accessors
+
+- (void)setRevealHeight:(CGFloat)revealHeight {
+    [super setRevealHeight:revealHeight];
+    [self updateCircleViewLayout];
 }
 
 #pragma mark - Overrides
@@ -137,16 +142,6 @@ static void CommonInit(MUKCirclePullToRefreshControl *__nonnull me) {
     me.clipsToBounds = NO;
     [me insertCircleViewIfNeeded];
     [me insertActivityIndicatorViewIfNeededAlignedWithCircleView:me.circleView];
-    [me observeRevealHeight];
-}
-
-#pragma mark - Private — Observations
-
-- (void)observeRevealHeight {
-    [self.KVOController observe:self keyPath:NSStringFromSelector(@selector(revealHeight)) options:NSKeyValueObservingOptionNew block:^(MUKCirclePullToRefreshControl *observer, MUKCirclePullToRefreshControl *object, NSDictionary *change)
-    {
-        [observer updateCircleViewLayout];
-    }];
 }
 
 #pragma mark - Private — Circle View
