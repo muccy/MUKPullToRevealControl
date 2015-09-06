@@ -100,6 +100,28 @@
     return nil;
 }
 
+- (void)setRevealState:(MUKPullToRevealControlState)revealState {
+    if (revealState != _revealState) {
+        MUKPullToRevealControlState const oldState = _revealState;
+
+        _revealState = revealState;
+        
+        // React
+        [self didChangeRevealStateFromState:oldState];
+    }
+}
+
+- (void)setUserIsTouchingScrollView:(BOOL)userIsTouchingScrollView {
+    if (userIsTouchingScrollView != _userIsTouchingScrollView) {
+        _userIsTouchingScrollView = userIsTouchingScrollView;
+        
+        // React
+        if (!userIsTouchingScrollView) {
+            [self userFinishedToTouchScrollView];
+        }
+    }
+}
+
 #pragma mark - Methods
 
 - (void)revealAnimated:(BOOL)animated {
@@ -204,8 +226,6 @@ static inline CGFloat PulledHeightInScrollView(UIScrollView *__nonnull scrollVie
 
 static void CommonInit(MUKPullToRevealControl *__nonnull me) {
     me->_revealHeight = 60.0f;
-    [me observeRevealState];
-    [me observeUserIsTouchingScrollView];
     
 #if DEBUG_SHOW_BORDERS
     me.layer.borderWidth = 2.0f;
@@ -216,7 +236,7 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
 #pragma mark - Private — Observations
 
 - (void)observeScrollViewContentInset:(UIScrollView *__nonnull)scrollView {
-    [self.KVOController observe:scrollView keyPath:NSStringFromSelector(@selector(contentInset)) options:NSKeyValueObservingOptionNew block:^(MUKPullToRevealControl *observer, UIScrollView *object, NSDictionary *change)
+    [self.KVOControllerNonRetaining observe:scrollView keyPath:NSStringFromSelector(@selector(contentInset)) options:NSKeyValueObservingOptionNew block:^(MUKPullToRevealControl *observer, UIScrollView *object, NSDictionary *change)
     {
 #if DEBUG_LOG_CONTENT_INSET
         NSLog(@"New inset = %@", NSStringFromUIEdgeInsets(object.contentInset));
@@ -226,7 +246,7 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
 }
 
 - (void)observeScrollViewContentOffset:(UIScrollView *__nonnull)scrollView {
-    [self.KVOController observe:scrollView keyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew block:^(MUKPullToRevealControl *observer, UIScrollView *object, NSDictionary *change)
+    [self.KVOControllerNonRetaining observe:scrollView keyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew block:^(MUKPullToRevealControl *observer, UIScrollView *object, NSDictionary *change)
     {
         // Resize
         [observer updateFrameInScrollView:scrollView];
@@ -253,28 +273,6 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
 
 - (void)unobserveScrollView:(UIScrollView *__nonnull)scrollView {
     [self.KVOController unobserve:scrollView];
-}
-
-- (void)observeRevealState {
-    [self.KVOController observe:self keyPath:NSStringFromSelector(@selector(revealState)) options:NSKeyValueObservingOptionNew block:^(MUKPullToRevealControl *observer, MUKPullToRevealControl *object, NSDictionary *change)
-    {
-        MUKPullToRevealControlState const oldState = [change[NSKeyValueChangeNewKey] integerValue];
-        [observer didChangeRevealStateFromState:oldState];
-    }];
-}
-
-- (void)observeUserIsTouchingScrollView {
-    [self.KVOController observe:self keyPath:NSStringFromSelector(@selector(userIsTouchingScrollView)) options:NSKeyValueObservingOptionNew block:^(MUKPullToRevealControl *observer, MUKPullToRevealControl *object, NSDictionary *change)
-    {
-        if (!observer.userIsTouchingScrollView && observer.jobAfterUserTouch)
-        {
-            [observer consumeJobAfterTouch];
-        }
-        
-        if (!observer.userIsTouchingScrollView) {
-            observer.currentUserTouchRevealedControl = NO;
-        }
-    }];
 }
 
 #pragma mark - Private — Events
@@ -331,6 +329,14 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
     {
         [self didChangePulledHeight:pulledHeight];
     }
+}
+
+- (void)userFinishedToTouchScrollView {
+    if (self.jobAfterUserTouch) {
+        [self consumeJobAfterTouch];
+    }
+    
+    self.currentUserTouchRevealedControl = NO;
 }
 
 #pragma mark - Private — Inset
