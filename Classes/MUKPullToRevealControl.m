@@ -32,9 +32,9 @@
 
 @interface MUKPullToRevealControl ()
 @property (nonatomic, readwrite) MUKPullToRevealControlState revealState;
+@property (nonatomic, readwrite) CGFloat contentInsetTopOffset;
 
 @property (nonatomic, readonly, nullable) UIScrollView *scrollView;
-@property (nonatomic) CGFloat contentInsetTopOffset;
 
 @property (nonatomic) BOOL userIsTouchingScrollView;
 @property (nonatomic) BOOL currentUserTouchRevealedControl;
