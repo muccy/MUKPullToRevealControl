@@ -15,7 +15,11 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
      */
     MUKPullToRevealControlStatePulling,
     /**
-     Control is revealed (expanded)
+     Control has been pulled by user who has not lifted his finger to reveal it
+     */
+    MUKPullToRevealControlStatePulled,
+    /**
+     Control is revealed (expanded) and user has lift his finger
      */
     MUKPullToRevealControlStateRevealed
 };

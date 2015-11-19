@@ -79,4 +79,8 @@
     return [actions copy];
 }
 
+- (instancetype)init {
+    return [self initWithTitle:@"" action:nil];
+}
+
 @end

@@ -99,6 +99,12 @@
                 break;
             }
                 
+            case MUKPullToRevealControlStatePulled: {
+                self.circleView.alpha = 0.0f;
+                [self.activityIndicatorView startAnimating];
+                break;
+            }
+                
             case MUKPullToRevealControlStatePulling : {
                 self.circleView.alpha = 1.0f;
                 [self.activityIndicatorView stopAnimating];

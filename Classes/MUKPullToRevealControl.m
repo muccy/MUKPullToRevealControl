@@ -5,6 +5,7 @@
 #define DEBUG_LOG_FRAME             0
 #define DEBUG_LOG_CONTENT_INSET     0
 #define DEBUG_LOG_SCROLLS           0
+#define DEBUG_LOG_USER_STATES       0
 
 @interface MUKPullToRevealControlScroll : NSObject
 @property (nonatomic, readonly) CGPoint contentOffset;
@@ -37,7 +38,6 @@
 @property (nonatomic, readonly, nullable) UIScrollView *scrollView;
 
 @property (nonatomic) BOOL userIsTouchingScrollView;
-@property (nonatomic) BOOL currentUserTouchRevealedControl;
 
 @property (nonatomic, copy) dispatch_block_t jobAfterUserTouch;
 @property (nonatomic) MUKPullToRevealControlScroll *runningScroll;
@@ -279,64 +279,73 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
 
 - (void)didChangePulledHeight:(CGFloat)pulledHeight inScrollView:(UIScrollView *__nonnull)scrollView
 {
-    // Change state only if user is moving scroll view
-    if (!self.currentUserTouchRevealedControl && scrollView.isDragging && !scrollView.isDecelerating)
-    {
+    // Only if user is moving scroll view
+    if (scrollView.isDragging && !scrollView.isDecelerating) {
         if (self.revealState == MUKPullToRevealControlStateRevealed) {
             // Do nothing
         }
         else if (pulledHeight < self.revealHeight) {
             if (pulledHeight <= 0.0f) {
+#if DEBUG_LOG_USER_STATES
+                NSLog(@"Reveal state = Covered");
+#endif
                 self.revealState = MUKPullToRevealControlStateCovered;
             }
             else {
+#if DEBUG_LOG_USER_STATES
+                NSLog(@"Reveal state = Pulling");
+#endif
                 [self setRevealStateOnce:MUKPullToRevealControlStatePulling];
             }
         }
-        else {
-            self.revealState = MUKPullToRevealControlStateRevealed;
-            self.currentUserTouchRevealedControl = YES;
-            
-            // Scroll to top when user lifts finger
-            UIEdgeInsets const newInset = [self newContentInsetForScrollView:scrollView inTransitionFromRevealState:MUKPullToRevealControlStatePulling toRevealState:MUKPullToRevealControlStateRevealed];
-            
-            CGPoint contentOffset = scrollView.contentOffset;
-            contentOffset.y = -newInset.top;
-            
-            __weak typeof(self) weakSelf = self;
-            MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithContentOffset:contentOffset animated:YES completionHandler:^(BOOL finished)
-            {
-                __strong __typeof(weakSelf) strongSelf = weakSelf;
-                [self setContentInset:newInset toScrollView:scrollView];
-                [strongSelf updateFrameInScrollView:scrollView];
-            }];
-
-            [self addJobAfterUserTouch:^{
-                __strong __typeof(weakSelf) strongSelf = weakSelf;
-                if (strongSelf.revealState == MUKPullToRevealControlStateRevealed)
-                {
-                    [strongSelf performScroll:scroll onScrollView:scrollView];
-                }
-            }];
-            
-            [self sendActionsForControlEvents:UIControlEventValueChanged];
+        else if (pulledHeight >= self.revealHeight) {
+#if DEBUG_LOG_USER_STATES
+            NSLog(@"Reveal state = Pulled");
+#endif
+            [self setRevealStateOnce:MUKPullToRevealControlStatePulled];
         }
     }
-    
+
     // Inform about pulling height changes when user originated
-    if (self.revealState == MUKPullToRevealControlStatePulling &&
-        (scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating))
-    {
+    BOOL const isPullState = self.revealState == MUKPullToRevealControlStatePulling || self.revealState == MUKPullToRevealControlStatePulled;
+    BOOL const scrollViewIsMoving = scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating;
+    if (isPullState && scrollViewIsMoving) {
         [self didChangePulledHeight:pulledHeight];
     }
 }
 
 - (void)userFinishedToTouchScrollView {
+    if (self.revealState == MUKPullToRevealControlStatePulled) {
+#if DEBUG_LOG_USER_STATES
+        NSLog(@"Reveal state = Revealed");
+#endif
+        self.revealState = MUKPullToRevealControlStateRevealed;
+    
+        // Scroll to top
+        UIScrollView *const scrollView = self.scrollView;
+        UIEdgeInsets const newInset = [self newContentInsetForScrollView:scrollView inTransitionFromRevealState:MUKPullToRevealControlStatePulling toRevealState:MUKPullToRevealControlStateRevealed];
+        
+        CGPoint contentOffset = self.scrollView.contentOffset;
+        contentOffset.y = -newInset.top;
+        
+        __weak typeof(self) weakSelf = self;
+        MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithContentOffset:contentOffset animated:YES completionHandler:^(BOOL finished)
+        {
+            __strong __typeof(weakSelf) strongSelf = weakSelf;
+            [strongSelf setContentInset:newInset toScrollView:scrollView];
+            [strongSelf updateFrameInScrollView:scrollView];
+        }];
+        
+        [self performScroll:scroll onScrollView:scrollView];
+        
+        // Trigger control state
+        [self sendActionsForControlEvents:UIControlEventValueChanged];
+    }
+    
+    // Consume job postponed after touch
     if (self.jobAfterUserTouch) {
         [self consumeJobAfterTouch];
     }
-    
-    self.currentUserTouchRevealedControl = NO;
 }
 
 #pragma mark - Private — Inset
