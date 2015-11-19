@@ -1,6 +1,6 @@
 PODS:
   - KVOController (1.0.3)
-  - MUKPullToRevealControl (1.0.0):
+  - MUKPullToRevealControl (1.0.3):
     - KVOController (~> 1.0.3)
 
 DEPENDENCIES:
@@ -12,6 +12,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   KVOController: 9fd8f0343670994e4b6f9f0b31f5a45663f3e1cf
-  MUKPullToRevealControl: 30c4d170cf25547692a925feb02fbd895a271a0f
+  MUKPullToRevealControl: f4543f12b4e7c2f1a73ff38e6efa6044b5519d32
 
-COCOAPODS: 0.38.2
+COCOAPODS: 0.39.0
