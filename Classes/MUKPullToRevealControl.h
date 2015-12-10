@@ -37,6 +37,11 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
  */
 @property (nonatomic) CGFloat revealHeight;
 /**
+ How much control is shifted from top-center position.
+ Default: UIOffsetZero
+ */
+@property (nonatomic) UIOffset positionOffset;
+/**
  How much this view is shifting scroll view offset
  */
 @property (nonatomic, readonly) CGFloat contentInsetTopOffset;
