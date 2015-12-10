@@ -122,6 +122,17 @@
     }
 }
 
+- (void)setPositionOffset:(UIOffset)positionOffset {
+    if (!UIOffsetEqualToOffset(positionOffset, _positionOffset)) {
+        _positionOffset = positionOffset;
+        
+        UIScrollView *const scrollView = self.scrollView;
+        if (scrollView) {
+            [self updateFrameInScrollView:scrollView];
+        }
+    }
+}
+
 #pragma mark - Methods
 
 - (void)revealAnimated:(BOOL)animated {
@@ -470,7 +481,7 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
         y = -self.contentInsetTopOffset;
     }
     
-    return CGRectMake(CGRectGetMinX(scrollView.bounds), y, CGRectGetWidth(scrollView.bounds), height);
+    return CGRectMake(CGRectGetMinX(scrollView.bounds) + self.positionOffset.horizontal, y + self.positionOffset.vertical, CGRectGetWidth(scrollView.bounds), height);
 }
 
 - (void)updateFrameInScrollView:(UIScrollView *__nonnull)scrollView {
