@@ -80,7 +80,7 @@
 }
 
 - (instancetype)init {
-    return [self initWithTitle:@"" action:nil];
+    return [self initWithTitle:@"" action:^{}];
 }
 
 @end

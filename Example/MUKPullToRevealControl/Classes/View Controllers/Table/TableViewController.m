@@ -72,4 +72,9 @@
     }
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return @"Section Header";
+}
+
 @end

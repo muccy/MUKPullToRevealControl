@@ -163,7 +163,7 @@ static void CommonInit(MUKCirclePullToRefreshControl *__nonnull me) {
         // Insert new
         MUKCirclePullToRefreshControlCircleView *const circleView = [[MUKCirclePullToRefreshControlCircleView alloc] initWithFrame:[self newCircleViewFrame]];
         circleView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleBottomMargin;
-        [self addSubview:circleView];
+        [self.contentView addSubview:circleView];
         self.circleView = circleView;
     }
 }
@@ -180,7 +180,7 @@ static void CommonInit(MUKCirclePullToRefreshControl *__nonnull me) {
     if (!self.activityIndicatorView) {
         UIActivityIndicatorView *view = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         view.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:view];
+        [self.contentView addSubview:view];
         self.activityIndicatorView = view;
         
         [self addConstraint:[NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:circleView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f]];

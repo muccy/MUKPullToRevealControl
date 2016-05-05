@@ -32,6 +32,11 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
  */
 @interface MUKPullToRevealControl : UIControl
 /**
+ The view which displays content. It grows vertically while control is pulled.
+ You should insert subviews here.
+ */
+@property (nonatomic, readonly, weak) UIView *contentView;
+/**
  When the control is pulled more than this value the control is revealed.
  Default: 60.0f
  */
