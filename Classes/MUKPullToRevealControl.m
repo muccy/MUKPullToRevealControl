@@ -38,13 +38,14 @@
 @property (nonatomic, readonly, nullable) UIScrollView *scrollView;
 
 @property (nonatomic) BOOL userIsTouchingScrollView, isUpdatingContentInset;
+@property (nonatomic) NSValue *trackedContentInset, *trackedContentOffset;
 
 @property (nonatomic, copy) dispatch_block_t jobAfterUserTouch;
 @property (nonatomic) MUKPullToRevealControlScroll *runningScroll;
 @end
 
 @implementation MUKPullToRevealControl
-@dynamic scrollView;
+@dynamic scrollView, originalTopInset;
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
@@ -100,6 +101,22 @@
     }
     
     return nil;
+}
+
+- (CGFloat)originalTopInset {
+    return self.originalContentInset.top;
+}
+
+- (void)setOriginalTopInset:(CGFloat)originalTopInset {
+    self.originalContentInset = ({
+        UIEdgeInsets inset = self.originalContentInset;
+        inset.top = originalTopInset;
+        inset;
+    });
+    
+    if ([self revealStateAffectsContentInset]) {
+        [self updateContentInsetForContentOffsetChangeInScrollView:self.scrollView];
+    }
 }
 
 - (void)setRevealState:(MUKPullToRevealControlState)revealState {
@@ -259,9 +276,9 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
         NSLog(@"New inset = %@", NSStringFromUIEdgeInsets(object.contentInset));
 #endif
         
-        if (![self revealStateAffectsContentInset]) {
+        if (![observer revealStateAffectsContentInset]) {
             // Keep track when not affected by reveal state
-            self.originalContentInset = scrollView.contentInset;
+            observer.originalContentInset = scrollView.contentInset;
         }
         
         [observer updateFrameInScrollView:object];
@@ -287,13 +304,13 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
             }
         }
 
-        if ([self revealStateAffectsContentInset]) {
+        if ([observer revealStateAffectsContentInset]) {
             // This helps to place table sections headers better
-            [self updateContentInsetForContentOffsetChangeInScrollView:scrollView];
+            [observer updateContentInsetForContentOffsetChangeInScrollView:scrollView];
         }
         else {
             // Keep track
-            self.originalContentInset = scrollView.contentInset;
+            observer.originalContentInset = scrollView.contentInset;
         }
         
         // Signal pull only with user interaction

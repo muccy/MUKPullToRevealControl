@@ -47,6 +47,23 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
  */
 @property (nonatomic) UIOffset positionOffset;
 /**
+ The base inset where control returns when covered.
+ You should update this value from you view controller if you plan to change top
+ inset while the control is in revealed state (e.g.: autorotation changes top
+ navigation bar, so the original top inset; hiding/showing navigation bar changes
+ top inset).
+ This value is automatically updated when reveal state is not 
+ MUKPullToRevealControlStateRevealed. Updating this value from you view controller
+ is quite easy:
+    @c  - (void)viewDidLayoutSubviews {
+    @c      [super viewDidLayoutSubviews];
+    @c      self.pullToRevealControl.originalTopInset = self.topLayoutGuide.length;
+    @c  }
+ 
+ }
+ */
+@property (nonatomic) CGFloat originalTopInset;
+/**
  Current reveal state
  */
 @property (nonatomic, readonly) MUKPullToRevealControlState revealState;
