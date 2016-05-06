@@ -15,6 +15,7 @@
 @interface TableViewController ()
 @property (nonatomic, copy) NSArray *actions;
 @property (nonatomic) NSUInteger emptyRows;
+@property (nonatomic, weak) MUKPullToRevealControl *pullToRevealControl;
 @end
 
 @implementation TableViewController
@@ -25,6 +26,7 @@
     MUKPullToRevealControl *const pullToRevealControl = [[MUKCirclePullToRefreshControl alloc] init];
     [pullToRevealControl addTarget:self action:@selector(pullToRevealControlTriggered:) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:pullToRevealControl];
+    self.pullToRevealControl = pullToRevealControl;
     
     self.emptyRows = 100;
     self.actions = [Action standardSetWithPullToRevealView:pullToRevealControl navigationController:self.navigationController];
@@ -37,6 +39,11 @@
         [pullToRevealControl coverAnimated:YES];
     });
 #endif
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    self.pullToRevealControl.originalTopInset = self.topLayoutGuide.length;
 }
 
 #pragma mark - Table
@@ -70,6 +77,11 @@
         action.action();
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return @"Section Header";
 }
 
 @end

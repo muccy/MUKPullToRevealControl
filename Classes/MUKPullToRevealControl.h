@@ -32,6 +32,11 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
  */
 @interface MUKPullToRevealControl : UIControl
 /**
+ The view which displays content. It grows vertically while control is pulled.
+ You should insert subviews here.
+ */
+@property (nonatomic, readonly, weak) UIView *contentView;
+/**
  When the control is pulled more than this value the control is revealed.
  Default: 60.0f
  */
@@ -42,9 +47,22 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
  */
 @property (nonatomic) UIOffset positionOffset;
 /**
- How much this view is shifting scroll view offset
+ The base inset where control returns when covered.
+ You should update this value from you view controller if you plan to change top
+ inset while the control is in revealed state (e.g.: autorotation changes top
+ navigation bar, so the original top inset; hiding/showing navigation bar changes
+ top inset).
+ This value is automatically updated when reveal state is not 
+ MUKPullToRevealControlStateRevealed. Updating this value from you view controller
+ is quite easy:
+    @c  - (void)viewDidLayoutSubviews {
+    @c      [super viewDidLayoutSubviews];
+    @c      self.pullToRevealControl.originalTopInset = self.topLayoutGuide.length;
+    @c  }
+ 
+ }
  */
-@property (nonatomic, readonly) CGFloat contentInsetTopOffset;
+@property (nonatomic) CGFloat originalTopInset;
 /**
  Current reveal state
  */

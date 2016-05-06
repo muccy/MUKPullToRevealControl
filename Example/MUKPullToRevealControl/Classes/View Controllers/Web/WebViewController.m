@@ -34,6 +34,11 @@
     }
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    self.pullToRevealControl.originalTopInset = self.topLayoutGuide.length;
+}
+
 - (void)pullToRevealControlTriggered:(MUKPullToRevealControl *)pullToRevealControl
 {
     [self.webView reload];

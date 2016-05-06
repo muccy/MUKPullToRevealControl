@@ -14,6 +14,7 @@
 @interface CollectionViewController ()
 @property (nonatomic, copy) NSArray *actions;
 @property (nonatomic) NSUInteger emptyItems;
+@property (nonatomic, weak) MUKPullToRevealControl *pullToRevealControl;
 @end
 
 @implementation CollectionViewController
@@ -23,9 +24,15 @@
     
     MUKPullToRevealControl *const pullToRevealControl = [[MUKCirclePullToRefreshControl alloc] init];
     [self.collectionView addSubview:pullToRevealControl];
+    self.pullToRevealControl = pullToRevealControl;
     
     self.actions = [Action standardSetWithPullToRevealView:pullToRevealControl navigationController:self.navigationController];
     self.emptyItems = 100;
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    self.pullToRevealControl.originalTopInset = self.topLayoutGuide.length;
 }
 
 #pragma mark <UICollectionViewDataSource>

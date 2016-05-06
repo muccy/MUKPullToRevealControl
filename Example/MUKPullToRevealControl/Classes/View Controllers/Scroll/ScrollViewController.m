@@ -37,6 +37,11 @@
     }
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    self.pullToRevealControl.originalTopInset = self.topLayoutGuide.length;
+}
+
 #pragma mark - Private
 
 - (void)insertButtonsForActions:(NSArray *__nonnull)actions {
