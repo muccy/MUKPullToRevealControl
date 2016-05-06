@@ -47,10 +47,6 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
  */
 @property (nonatomic) UIOffset positionOffset;
 /**
- How much this view is shifting scroll view offset
- */
-@property (nonatomic, readonly) CGFloat contentInsetTopOffset;
-/**
  Current reveal state
  */
 @property (nonatomic, readonly) MUKPullToRevealControlState revealState;
