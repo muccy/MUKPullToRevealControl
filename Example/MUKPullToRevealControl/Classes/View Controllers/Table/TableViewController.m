@@ -10,7 +10,8 @@
 #import "MUKCirclePullToRefreshControl.h"
 #import "Action.h"
 
-#define DEBUG_FAST_COVER    0
+#define DEBUG_FAST_COVER        0
+#define DEBUG_OPAQUE_NAV_BAR    0
 
 @interface TableViewController ()
 @property (nonatomic, copy) NSArray *actions;
@@ -22,6 +23,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+#if DEBUG_OPAQUE_NAV_BAR
+    self.navigationController.navigationBar.barTintColor = [UIColor lightGrayColor];
+    self.navigationController.navigationBar.translucent = NO;
+#endif
     
     MUKPullToRevealControl *const pullToRevealControl = [[MUKCirclePullToRefreshControl alloc] init];
     [pullToRevealControl addTarget:self action:@selector(pullToRevealControlTriggered:) forControlEvents:UIControlEventValueChanged];
