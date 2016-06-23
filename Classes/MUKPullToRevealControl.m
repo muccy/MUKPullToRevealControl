@@ -166,7 +166,7 @@
         __weak typeof(self) weakSelf = self;
         void const (^update)(void) = ^{
             __strong __typeof(weakSelf) strongSelf = weakSelf;
-            [self setContentInset:newInset toScrollView:scrollView];
+            [strongSelf setContentInset:newInset toScrollView:scrollView];
             [strongSelf updateFrameInScrollView:scrollView];
             [strongSelf updateContentViewFrameInScrollView:scrollView];
         };
@@ -244,7 +244,7 @@
 #pragma mark - Callbacks
 
 - (void)didChangeRevealStateFromState:(MUKPullToRevealControlState)oldState {
-    //
+    [self updateContentViewFrameInScrollView:self.scrollView];
 }
 
 - (void)didChangePulledHeight:(CGFloat)pulledHeight {

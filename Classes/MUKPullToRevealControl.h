@@ -82,12 +82,12 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
  Reveal state has changed
  @param oldState Reveal state before transition
  */
-- (void)didChangeRevealStateFromState:(MUKPullToRevealControlState)oldState;
+- (void)didChangeRevealStateFromState:(MUKPullToRevealControlState)oldState NS_REQUIRES_SUPER;
 /**
  Pulled height has changed
  @param pulledHeight How much user has pulled the scroll view
  */
-- (void)didChangePulledHeight:(CGFloat)pulledHeight;
+- (void)didChangePulledHeight:(CGFloat)pulledHeight NS_REQUIRES_SUPER;
 @end
 
 NS_ASSUME_NONNULL_END
