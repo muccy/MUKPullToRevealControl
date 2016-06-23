@@ -214,7 +214,9 @@
             [self updateContentViewFrameInScrollView:scrollView];
         }];
         
-        BOOL const shouldScroll = CGRectIntersectsRect(self.frame, self.scrollView.bounds);
+        CGFloat const yOffsetAfterRunningScroll = scrollView.contentOffset.y + self.runningScroll.contentOffset.y;
+        BOOL const shouldScroll = yOffsetAfterRunningScroll + scrollView.contentInset.top < 0.0f;
+        
         if (shouldScroll) {
             CGPoint contentOffset = scrollView.contentOffset;
             contentOffset.y = -newInset.top;
