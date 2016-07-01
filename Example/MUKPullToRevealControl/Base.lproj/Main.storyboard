@@ -60,7 +60,13 @@
                             <outlet property="delegate" destination="DyE-gn-YEv" id="yJH-Xf-hfb"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Table" id="uiI-Zs-9Hm"/>
+                    <navigationItem key="navigationItem" title="Table" id="uiI-Zs-9Hm">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="2Ia-rQ-lcx">
+                            <connections>
+                                <segue destination="DyE-gn-YEv" kind="show" identifier="show" id="ENI-0D-SEZ"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KXS-ld-pfs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -264,4 +270,7 @@
             <point key="canvasLocation" x="737" y="1880"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="N7k-bQ-4Fu"/>
+    </inferredMetricsTieBreakers>
 </document>
