@@ -51,7 +51,8 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
  You should update this value from you view controller if you plan to change top
  inset while the control is in revealed state (e.g.: autorotation changes top
  navigation bar, so the original top inset; hiding/showing navigation bar changes
- top inset).
+ top inset) or to reveal-cover when your view controller is hidden (e.g.: previous
+ view controller in a navigation stack).
  This value is automatically updated when reveal state is not 
  MUKPullToRevealControlStateRevealed. Updating this value from you view controller
  is quite easy:

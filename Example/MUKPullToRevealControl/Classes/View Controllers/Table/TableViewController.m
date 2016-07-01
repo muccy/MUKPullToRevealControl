@@ -12,6 +12,8 @@
 
 #define DEBUG_FAST_COVER        0
 #define DEBUG_OPAQUE_NAV_BAR    0
+#define DEBUG_REVEAL_AFTER_PUSH 0
+#define DEBUG_COVER_AFTER_PUSH  0
 
 @interface TableViewController ()
 @property (nonatomic, copy) NSArray *actions;
@@ -50,6 +52,24 @@
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     self.pullToRevealControl.originalTopInset = self.topLayoutGuide.length;
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    [super prepareForSegue:segue sender:sender];
+    
+#if DEBUG_REVEAL_AFTER_PUSH || DEBUG_COVER_AFTER_PUSH
+    if ([segue.identifier isEqualToString:@"show"]) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (DEBUG_REVEAL_AFTER_PUSH) {
+                [self.pullToRevealControl revealAnimated:NO];
+            }
+            
+            if (DEBUG_COVER_AFTER_PUSH) {
+                [self.pullToRevealControl coverAnimated:NO];
+            }
+        });
+    }
+#endif
 }
 
 #pragma mark - Table

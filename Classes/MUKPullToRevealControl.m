@@ -117,6 +117,16 @@
     if ([self revealStateAffectsContentInset]) {
         [self updateContentInsetForContentOffsetChangeInScrollView:self.scrollView];
     }
+    else if (![self contentInsetRespectsCoveredRevealState]) {
+        // Useful when reveal/cover is performed out of screen (e.g.: in a previous
+        // view controller on a navigation stack). This check ensures top inset
+        // is respected also in covered state.
+        [self setContentInset:({
+            UIEdgeInsets inset = self.scrollView.contentInset;
+            inset.top = originalTopInset;
+            inset;
+        }) toScrollView:self.scrollView];
+    }
 }
 
 - (void)setRevealState:(MUKPullToRevealControlState)revealState {
@@ -437,6 +447,10 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
 
 - (BOOL)revealStateAffectsContentInset {
     return self.revealState == MUKPullToRevealControlStateRevealed;
+}
+
+- (BOOL)contentInsetRespectsCoveredRevealState {
+    return self.revealState == MUKPullToRevealControlStateCovered && self.scrollView.contentInset.top == self.originalContentInset.top;
 }
 
 #pragma mark - Private - Scroll
