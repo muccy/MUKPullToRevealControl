@@ -1,5 +1,5 @@
 #import "MUKPullToRevealControl.h"
-#import <KVOController/FBKVOController.h>
+#import <MUKSignal/MUKSignal.h>
 
 #define DEBUG_SHOW_BORDERS          0
 #define DEBUG_LOG_FRAME             0
@@ -36,6 +36,7 @@
 @property (nonatomic, readwrite) UIEdgeInsets originalContentInset;
 
 @property (nonatomic, readonly, nullable) UIScrollView *scrollView;
+@property (nonatomic, readonly, nullable) MUKSignalObservation<MUKKVOSignal *> *scrollViewContentInsetObservation, *scrollViewContentOffsetObservation;
 
 @property (nonatomic) BOOL userIsTouchingScrollView, isUpdatingContentInset;
 @property (nonatomic) NSValue *trackedContentInset, *trackedContentOffset;
@@ -46,6 +47,12 @@
 
 @implementation MUKPullToRevealControl
 @dynamic scrollView, originalTopInset;
+
+- (void)dealloc {
+    // Ensure immediate unobservation
+    _scrollViewContentInsetObservation = nil;
+    _scrollViewContentOffsetObservation = nil;
+}
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
@@ -132,7 +139,7 @@
 - (void)setRevealState:(MUKPullToRevealControlState)revealState {
     if (revealState != _revealState) {
         MUKPullToRevealControlState const oldState = _revealState;
-
+        
         _revealState = revealState;
         
         // React
@@ -172,13 +179,17 @@
             inset.top += self.revealHeight;
             inset;
         });
-
+        
         __weak typeof(self) weakSelf = self;
+        __weak __typeof__(scrollView) weakScrollView = scrollView;
+
         void const (^update)(void) = ^{
             __strong __typeof(weakSelf) strongSelf = weakSelf;
-            [strongSelf setContentInset:newInset toScrollView:scrollView];
-            [strongSelf updateFrameInScrollView:scrollView];
-            [strongSelf updateContentViewFrameInScrollView:scrollView];
+            __strong __typeof__(weakScrollView) strongScrollView = weakScrollView;
+
+            [strongSelf setContentInset:newInset toScrollView:strongScrollView];
+            [strongSelf updateFrameInScrollView:strongScrollView];
+            [strongSelf updateContentViewFrameInScrollView:strongScrollView];
         };
         
         CGRect const boundsAfterScroll = ({
@@ -232,15 +243,19 @@
             contentOffset.y = -newInset.top;
             
             MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithContentOffset:contentOffset animated:animated completionHandler:^(BOOL finished) { /* Do nothing */ }];
-
+            
             if (self.userIsTouchingScrollView) {
                 // Postpone
                 __weak typeof(self) weakSelf = self;
+                __weak __typeof__(scrollView) weakScrollView = scrollView;
+
                 [self addJobAfterUserTouch:^{
                     __strong __typeof(weakSelf) strongSelf = weakSelf;
+                    __strong __typeof__(weakScrollView) strongScrollView = weakScrollView;
+
                     if (strongSelf.revealState == MUKPullToRevealControlStateCovered)
                     {
-                        [strongSelf performScroll:scroll onScrollView:scrollView];
+                        [strongSelf performScroll:scroll onScrollView:strongScrollView];
                     }
                 }];
             }
@@ -287,61 +302,85 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
 
 #pragma mark - Private — Observations
 
-- (void)observeScrollViewContentInset:(UIScrollView *__nonnull)scrollView {
-    [self.KVOControllerNonRetaining observe:scrollView keyPath:NSStringFromSelector(@selector(contentInset)) options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld block:^(MUKPullToRevealControl *observer, UIScrollView *object, NSDictionary *change)
+- (void)observeScrollViewContentInset:(UIScrollView * _Nonnull)scrollView {
+    __weak __typeof__(self) weakSelf = self;
+    __weak __typeof__(scrollView) weakScrollView = scrollView;
+    
+    MUKKVOSignal *const signal = [[MUKKVOSignal alloc] initWithObject:scrollView keyPath:NSStringFromSelector(@selector(contentInset))];
+    _scrollViewContentInsetObservation = [MUKSignalObservation observationWithSignal:signal token:[signal subscribe:^(MUKKVOSignalChange<NSNumber *> * _Nonnull change)
     {
+        __strong __typeof__(weakSelf) strongSelf = weakSelf;
+        __strong __typeof__(weakScrollView) strongScrollView = weakScrollView;
+        UIEdgeInsets const newInset = change.value.UIEdgeInsetsValue;
+        
 #if DEBUG_LOG_CONTENT_INSET
-        NSLog(@"New inset = %@", NSStringFromUIEdgeInsets(object.contentInset));
+        NSLog(@"New inset = %@", NSStringFromUIEdgeInsets(newInset));
 #endif
         
-        if (![observer revealStateAffectsContentInset]) {
+        if (![strongSelf revealStateAffectsContentInset]) {
             // Keep track when not affected by reveal state
-            observer.originalContentInset = scrollView.contentInset;
+            strongSelf.originalContentInset = newInset;
         }
         
-        [observer updateFrameInScrollView:object];
-        [observer updateContentViewFrameInScrollView:object];
-    }];
+        [strongSelf updateFrameInScrollView:strongScrollView];
+        [strongSelf updateContentViewFrameInScrollView:strongScrollView];
+    }]];
 }
 
-- (void)observeScrollViewContentOffset:(UIScrollView *__nonnull)scrollView {
-    [self.KVOControllerNonRetaining observe:scrollView keyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew block:^(MUKPullToRevealControl *observer, UIScrollView *object, NSDictionary *change)
+- (void)observeScrollViewContentOffset:(UIScrollView * _Nonnull)scrollView {
+    __weak __typeof__(self) weakSelf = self;
+    __weak __typeof__(scrollView) weakScrollView = scrollView;
+    
+    MUKKVOSignal *const signal = [[MUKKVOSignal alloc] initWithObject:scrollView keyPath:NSStringFromSelector(@selector(contentOffset))];
+    _scrollViewContentOffsetObservation = [MUKSignalObservation observationWithSignal:signal token:[signal subscribe:^(MUKKVOSignalChange<NSNumber *> * _Nonnull change)
     {
+        __strong __typeof__(weakSelf) strongSelf = weakSelf;
+        __strong __typeof__(weakScrollView) strongScrollView = weakScrollView;
+        CGPoint const newOffset = change.value.CGPointValue;
+        
         // Resize
-        [observer updateFrameInScrollView:scrollView];
-        [observer updateContentViewFrameInScrollView:scrollView];
+        [strongSelf updateFrameInScrollView:strongScrollView];
+        [strongSelf updateContentViewFrameInScrollView:strongScrollView];
         
         // Update user is touching
-        [observer updateUserIsTouchingScrollView:object];
+        [strongSelf updateUserIsTouchingScrollView:strongScrollView];
         
         // Manage manual scrolling completion
-        if (observer.runningScroll) {
-            if (CGPointEqualToPoint(observer.runningScroll.contentOffset, scrollView.contentOffset))
+        if (strongSelf.runningScroll) {
+            if (CGPointEqualToPoint(strongSelf.runningScroll.contentOffset, newOffset))
             {
-                [observer didCompleteScroll:observer.runningScroll finished:YES];
+                [strongSelf didCompleteScroll:strongSelf.runningScroll finished:YES];
             }
         }
-
-        if ([observer revealStateAffectsContentInset]) {
+        
+        if ([strongSelf revealStateAffectsContentInset]) {
             // This helps to place table sections headers better
-            [observer updateContentInsetForContentOffsetChangeInScrollView:scrollView];
+            [strongSelf updateContentInsetForContentOffsetChangeInScrollView:strongScrollView];
         }
         else {
             // Keep track
-            observer.originalContentInset = scrollView.contentInset;
+            strongSelf.originalContentInset = strongScrollView.contentInset;
         }
         
         // Signal pull only with user interaction
-        if (scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating)
+        if (strongScrollView.isTracking || strongScrollView.isDragging || strongScrollView.isDecelerating)
         {
-            CGFloat const pulledHeight = PulledHeightInScrollView(object);
-            [observer didChangePulledHeight:pulledHeight inScrollView:object];
+            CGFloat const pulledHeight = PulledHeightInScrollView(strongScrollView);
+            [strongSelf didChangePulledHeight:pulledHeight inScrollView:strongScrollView];
         }
-    }];
+    }]];
 }
 
-- (void)unobserveScrollView:(UIScrollView *__nonnull)scrollView {
-    [self.KVOController unobserve:scrollView];
+- (void)unobserveScrollView:(UIScrollView * _Nonnull)scrollView {
+    if ([self.scrollViewContentInsetObservation.signal.object isEqual:scrollView])
+    {
+        _scrollViewContentInsetObservation = nil;
+    }
+    
+    if ([self.scrollViewContentOffsetObservation.signal.object isEqual:scrollView])
+    {
+        _scrollViewContentOffsetObservation = nil;
+    }
 }
 
 #pragma mark - Private — Events
@@ -374,7 +413,7 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
             [self setRevealStateOnce:MUKPullToRevealControlStatePulled];
         }
     }
-
+    
     // Inform about pulling height changes when user originated
     BOOL const isPullState = self.revealState == MUKPullToRevealControlStatePulling || self.revealState == MUKPullToRevealControlStatePulled;
     BOOL const scrollViewIsMoving = scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating;
@@ -556,7 +595,7 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
 - (CGRect)newContentViewFrameInScrollView:(UIScrollView *__nonnull)scrollView {
     CGRect frame = self.bounds;
     CGFloat const pulledHeight = PulledHeightInScrollView(scrollView);
-
+    
     CGFloat const height = ({
         CGFloat h;
         
