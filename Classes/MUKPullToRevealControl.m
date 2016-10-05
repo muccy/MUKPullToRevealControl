@@ -372,12 +372,12 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
 }
 
 - (void)unobserveScrollView:(UIScrollView * _Nonnull)scrollView {
-    if ([self.scrollViewContentInsetObservation.signal.object isEqual:scrollView])
+    if ([self.scrollViewContentInsetObservation.signal isObservingObject:scrollView])
     {
         _scrollViewContentInsetObservation = nil;
     }
     
-    if ([self.scrollViewContentOffsetObservation.signal.object isEqual:scrollView])
+    if ([self.scrollViewContentOffsetObservation.signal isObservingObject:scrollView])
     {
         _scrollViewContentOffsetObservation = nil;
     }

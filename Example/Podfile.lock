@@ -1,7 +1,7 @@
 PODS:
-  - MUKPullToRevealControl (1.1.3):
-    - MUKSignal (~> 1.0.3)
-  - MUKSignal (1.0.3)
+  - MUKPullToRevealControl (1.1.4):
+    - MUKSignal (~> 1.0.4)
+  - MUKSignal (1.0.4)
 
 DEPENDENCIES:
   - MUKPullToRevealControl (from `../`)
@@ -11,8 +11,8 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  MUKPullToRevealControl: 8ac46bcc94b47ff0013328e89c648cd5f4f67ca1
-  MUKSignal: bb6af99631134f6fc93bb3df598e2481d7e67665
+  MUKPullToRevealControl: bde3879d65a0bf47e5a7e9abacee91540c8ba659
+  MUKSignal: 83e713913368eca5bb795245a068da8abf700906
 
 PODFILE CHECKSUM: 46302d3143d880ab59e7b62cc161b2587f2c7a9f
 
