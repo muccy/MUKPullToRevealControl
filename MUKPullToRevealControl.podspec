@@ -19,5 +19,5 @@ Pod::Spec.new do |s|
   s.source_files = 'Classes/*.{h,m}'
   s.compiler_flags  = '-Wdocumentation'
   
-  s.dependency  'KVOController', '~> 1.0.3'
+  s.dependency  'MUKSignal', '~> 1.0.3'
 end
