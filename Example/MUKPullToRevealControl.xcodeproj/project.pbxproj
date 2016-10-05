@@ -19,7 +19,7 @@
 		0674EC981B846F6000B51B10 /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0674EC8E1B846F6000B51B10 /* TableViewController.m */; };
 		0674EC991B846F6000B51B10 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0674EC911B846F6000B51B10 /* WebViewController.m */; };
 		0674EC9A1B846F6000B51B10 /* CollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0674EC951B846F6000B51B10 /* CollectionViewCell.m */; };
-		9E6981FCFC251831013225B9 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B570E6CB971FEF03970C792 /* libPods.a */; };
+		139B23E1C43C6693DA8BD5CF /* libPods-MUKPullToRevealControl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 352F5B01C5E304C8CCE7BDCA /* libPods-MUKPullToRevealControl.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,9 +56,9 @@
 		0674EC911B846F6000B51B10 /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
 		0674EC941B846F6000B51B10 /* CollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectionViewCell.h; sourceTree = "<group>"; };
 		0674EC951B846F6000B51B10 /* CollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionViewCell.m; sourceTree = "<group>"; };
-		6B570E6CB971FEF03970C792 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		9D8826DCD1EE43FB5A9C1EB4 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
-		E68BF4CE0D64D42CC17081CF /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		352F5B01C5E304C8CCE7BDCA /* libPods-MUKPullToRevealControl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MUKPullToRevealControl.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F5196DEC9BC1AB5C6669938 /* Pods-MUKPullToRevealControl.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MUKPullToRevealControl.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MUKPullToRevealControl/Pods-MUKPullToRevealControl.debug.xcconfig"; sourceTree = "<group>"; };
+		D6D2685F65BA7FCB6C8FA5DD /* Pods-MUKPullToRevealControl.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MUKPullToRevealControl.release.xcconfig"; path = "Pods/Target Support Files/Pods-MUKPullToRevealControl/Pods-MUKPullToRevealControl.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,7 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9E6981FCFC251831013225B9 /* libPods.a in Frameworks */,
+				139B23E1C43C6693DA8BD5CF /* libPods-MUKPullToRevealControl.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,8 +86,8 @@
 				0674EC4C1B846DD200B51B10 /* MUKPullToRevealControl */,
 				0674EC691B846DD300B51B10 /* MUKPullToRevealControlTests */,
 				0674EC4B1B846DD200B51B10 /* Products */,
-				89E78C46CBA6734F0CEDF9E8 /* Pods */,
-				C01D77AF324590F568158136 /* Frameworks */,
+				5DCA4FBA62ECCA83CE2CCD53 /* Pods */,
+				9DD60188B067A02F6720EF01 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -239,19 +239,19 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
-		89E78C46CBA6734F0CEDF9E8 /* Pods */ = {
+		5DCA4FBA62ECCA83CE2CCD53 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				E68BF4CE0D64D42CC17081CF /* Pods.debug.xcconfig */,
-				9D8826DCD1EE43FB5A9C1EB4 /* Pods.release.xcconfig */,
+				3F5196DEC9BC1AB5C6669938 /* Pods-MUKPullToRevealControl.debug.xcconfig */,
+				D6D2685F65BA7FCB6C8FA5DD /* Pods-MUKPullToRevealControl.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		C01D77AF324590F568158136 /* Frameworks */ = {
+		9DD60188B067A02F6720EF01 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				6B570E6CB971FEF03970C792 /* libPods.a */,
+				352F5B01C5E304C8CCE7BDCA /* libPods-MUKPullToRevealControl.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -263,12 +263,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0674EC701B846DD300B51B10 /* Build configuration list for PBXNativeTarget "MUKPullToRevealControl" */;
 			buildPhases = (
-				B7F88E9FE55356E350F6EC2C /* Check Pods Manifest.lock */,
+				E32D8C90CF4611C10127F73A /* [CP] Check Pods Manifest.lock */,
 				0674EC461B846DD200B51B10 /* Sources */,
 				0674EC471B846DD200B51B10 /* Frameworks */,
 				0674EC481B846DD200B51B10 /* Resources */,
-				0C46F5AA8B04D5ECB8F59D7E /* Copy Pods Resources */,
-				6DEC0E3926867C09A50E507C /* Embed Pods Frameworks */,
+				95224C30B8F395820A4DAA71 /* [CP] Embed Pods Frameworks */,
+				D962DCB7A73BCFFCD6342247 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -355,44 +355,44 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0C46F5AA8B04D5ECB8F59D7E /* Copy Pods Resources */ = {
+		95224C30B8F395820A4DAA71 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MUKPullToRevealControl/Pods-MUKPullToRevealControl-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6DEC0E3926867C09A50E507C /* Embed Pods Frameworks */ = {
+		D962DCB7A73BCFFCD6342247 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MUKPullToRevealControl/Pods-MUKPullToRevealControl-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B7F88E9FE55356E350F6EC2C /* Check Pods Manifest.lock */ = {
+		E32D8C90CF4611C10127F73A /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -539,7 +539,7 @@
 		};
 		0674EC711B846DD300B51B10 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E68BF4CE0D64D42CC17081CF /* Pods.debug.xcconfig */;
+			baseConfigurationReference = 3F5196DEC9BC1AB5C6669938 /* Pods-MUKPullToRevealControl.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = MUKPullToRevealControl/Info.plist;
@@ -551,7 +551,7 @@
 		};
 		0674EC721B846DD300B51B10 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9D8826DCD1EE43FB5A9C1EB4 /* Pods.release.xcconfig */;
+			baseConfigurationReference = D6D2685F65BA7FCB6C8FA5DD /* Pods-MUKPullToRevealControl.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = MUKPullToRevealControl/Info.plist;

@@ -1,1 +1,3 @@
-pod "MUKPullToRevealControl", :path => "../"
+target 'MUKPullToRevealControl' do
+  pod "MUKPullToRevealControl", :path => "../"
+end

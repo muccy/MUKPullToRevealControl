@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "MUKPullToRevealControl"
-  s.version          = "1.1.3"
+  s.version          = "1.1.4"
   s.summary          = "Pull to reveal and pull to refresh for every UIScrollView."
   s.description      = <<-DESC
                         MUKPullToRevealControl, when added to a UIScrollView instance, places itself at top
@@ -19,5 +19,5 @@ Pod::Spec.new do |s|
   s.source_files = 'Classes/*.{h,m}'
   s.compiler_flags  = '-Wdocumentation'
   
-  s.dependency  'KVOController', '~> 1.0.3'
+  s.dependency  'MUKSignal', '~> 1.0.3'
 end
