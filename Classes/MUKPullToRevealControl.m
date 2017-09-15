@@ -6,19 +6,24 @@
 #define DEBUG_LOG_CONTENT_INSET     0
 #define DEBUG_LOG_SCROLLS           0
 #define DEBUG_LOG_USER_STATES       0
+#define DEBUG_LOG_USER_TOUCHING_SV  0
 
 @interface MUKPullToRevealControlScroll : NSObject
+@property (nonatomic, readonly, copy) NSString *name;
 @property (nonatomic, readonly) CGPoint contentOffset;
 @property (nonatomic, readonly) BOOL animated;
-@property (nonatomic, readonly, copy) void (^completionHandler)(BOOL finished);
+@property (nonatomic, readonly, nullable, copy) void (^completionHandler)(BOOL finished);
+
+- (instancetype)init NS_UNAVAILABLE;
 @end
 
 @implementation MUKPullToRevealControlScroll
 
-- (instancetype)initWithContentOffset:(CGPoint)contentOffset animated:(BOOL)animated completionHandler:(void (^__nonnull)(BOOL finished))completionHandler
+- (instancetype)initWithName:(NSString *)name contentOffset:(CGPoint)contentOffset animated:(BOOL)animated completionHandler:(void (^_Nullable)(BOOL finished))completionHandler
 {
     self = [super init];
     if (self) {
+        _name = name;
         _contentOffset = contentOffset;
         _animated = animated;
         _completionHandler = [completionHandler copy];
@@ -34,6 +39,7 @@
 @interface MUKPullToRevealControl ()
 @property (nonatomic, readwrite) MUKPullToRevealControlState revealState;
 @property (nonatomic, readwrite) UIEdgeInsets originalContentInset;
+@property (nonatomic, readonly) BOOL ignoresOriginalContentInset;
 
 @property (nonatomic, readonly, nullable) UIScrollView *scrollView;
 @property (nonatomic, readonly, nullable) MUKSignalObservation<MUKKVOSignal *> *scrollViewContentInsetObservation, *scrollViewContentOffsetObservation;
@@ -46,7 +52,7 @@
 @end
 
 @implementation MUKPullToRevealControl
-@dynamic scrollView, originalTopInset;
+@dynamic scrollView, originalTopInset, ignoresOriginalTopInset;
 
 - (void)dealloc {
     // Ensure immediate unobservation
@@ -96,7 +102,9 @@
         [self unobserveScrollView:oldScrollView];
         [self updateUserIsTouchingScrollView:nil];
         
-        [self setContentInset:self.originalContentInset toScrollView:oldScrollView];
+        if (!self.ignoresOriginalTopInset) {
+            [self setContentInset:self.originalContentInset toScrollView:oldScrollView];
+        }
     }
 }
 
@@ -110,6 +118,15 @@
     return nil;
 }
 
+- (BOOL)ignoresOriginalTopInset {
+    if (@available(iOS 11, *)) {
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
+
 - (CGFloat)originalTopInset {
     return self.originalContentInset.top;
 }
@@ -121,18 +138,20 @@
         inset;
     });
     
-    if ([self revealStateAffectsContentInset]) {
-        [self updateContentInsetForContentOffsetChangeInScrollView:self.scrollView];
-    }
-    else if (![self contentInsetRespectsCoveredRevealState]) {
-        // Useful when reveal/cover is performed out of screen (e.g.: in a previous
-        // view controller on a navigation stack). This check ensures top inset
-        // is respected also in covered state.
-        [self setContentInset:({
-            UIEdgeInsets inset = self.scrollView.contentInset;
-            inset.top = originalTopInset;
-            inset;
-        }) toScrollView:self.scrollView];
+    if (!self.ignoresOriginalTopInset) {
+        if ([self revealStateAffectsContentInset]) {
+            [self updateContentInsetForContentOffsetChangeInScrollView:self.scrollView];
+        }
+        else if (![self contentInsetRespectsCoveredRevealState]) {
+            // Useful when reveal/cover is performed out of screen (e.g.: in a previous
+            // view controller on a navigation stack). This check ensures top inset
+            // is respected also in covered state.
+            [self setContentInset:({
+                UIEdgeInsets inset = self.scrollView.contentInset;
+                inset.top = originalTopInset;
+                inset;
+            }) toScrollView:self.scrollView];
+        }
     }
 }
 
@@ -150,6 +169,10 @@
 - (void)setUserIsTouchingScrollView:(BOOL)userIsTouchingScrollView {
     if (userIsTouchingScrollView != _userIsTouchingScrollView) {
         _userIsTouchingScrollView = userIsTouchingScrollView;
+        
+#if DEBUG_LOG_USER_TOUCHING_SV
+        NSLog(@"User is touching scroll view? %@", userIsTouchingScrollView ? @"Y" : @"N");
+#endif
         
         // React
         if (!userIsTouchingScrollView) {
@@ -174,11 +197,7 @@
 - (void)revealAnimated:(BOOL)animated {
     if (self.revealState != MUKPullToRevealControlStateRevealed) {
         UIScrollView *const scrollView = self.scrollView;
-        UIEdgeInsets const newInset = ({
-            UIEdgeInsets inset = self.originalContentInset;
-            inset.top += self.revealHeight;
-            inset;
-        });
+        UIEdgeInsets const newInset = [self revealedInsetsOfScrollView:scrollView];
         
         __weak typeof(self) weakSelf = self;
         __weak __typeof__(scrollView) weakScrollView = scrollView;
@@ -204,9 +223,15 @@
         BOOL const shouldScroll = CGRectIntersectsRect(potentialFrame, boundsAfterScroll);
         if (shouldScroll) {
             CGPoint contentOffset = scrollView.contentOffset;
-            contentOffset.y = -newInset.top;
             
-            MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithContentOffset:contentOffset animated:animated completionHandler:^(BOOL finished)
+            if (@available(iOS 11, *)) {
+                contentOffset.y = -newInset.top - scrollView.safeAreaInsets.top;
+            }
+            else {
+                contentOffset.y = -newInset.top;
+            }
+            
+            MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"reveal" contentOffset:contentOffset animated:animated completionHandler:^(BOOL finished)
             {
                 if (finished) {
                     update();
@@ -217,6 +242,11 @@
         }
         else {
             update();
+            
+            if (@available(iOS 11, *)) {
+                // Don't wait first user scroll in order to adjust insets
+                [self updateContentInsetForContentOffsetChangeInScrollView:scrollView];
+            }
         }
         
         self.revealState = MUKPullToRevealControlStateRevealed;
@@ -226,8 +256,8 @@
 - (void)coverAnimated:(BOOL)animated {
     if (self.revealState == MUKPullToRevealControlStateRevealed) {
         UIScrollView *const scrollView = self.scrollView;
-        UIEdgeInsets const newInset = self.originalContentInset;
-        
+        UIEdgeInsets const newInset = [self coveredInsetsOfScrollView:scrollView];
+
         self.revealState = MUKPullToRevealControlStateCovered;
         [UIView animateWithDuration:animated ? 0.4 : 0.0 animations:^{
             [self setContentInset:newInset toScrollView:scrollView];
@@ -236,13 +266,25 @@
         }];
         
         CGFloat const yOffsetAfterRunningScroll = scrollView.contentOffset.y + self.runningScroll.contentOffset.y;
-        BOOL const shouldScroll = yOffsetAfterRunningScroll + scrollView.contentInset.top < 0.0f;
         
+        CGFloat scrollThreshold;
+        if (@available(iOS 11, *)) {
+            scrollThreshold = -scrollView.safeAreaInsets.top;
+        }
+        else {
+            scrollThreshold = -scrollView.contentInset.top;
+        }
+        
+        BOOL const shouldScroll = yOffsetAfterRunningScroll < scrollThreshold;
         if (shouldScroll) {
             CGPoint contentOffset = scrollView.contentOffset;
             contentOffset.y = -newInset.top;
             
-            MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithContentOffset:contentOffset animated:animated completionHandler:^(BOOL finished) { /* Do nothing */ }];
+            if (@available(iOS 11, *)) {
+                contentOffset.y -= scrollView.safeAreaInsets.top;
+            }
+
+            MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"cover" contentOffset:contentOffset animated:animated completionHandler:nil];
             
             if (self.userIsTouchingScrollView) {
                 // Postpone
@@ -262,7 +304,7 @@
             else {
                 [self performScroll:scroll onScrollView:scrollView];
             }
-        }
+        } // if shouldScroll
     }
 }
 
@@ -279,7 +321,16 @@
 #pragma mark - Private
 
 static inline CGFloat PulledHeightInScrollView(UIScrollView *__nonnull scrollView) {
-    return -scrollView.contentOffset.y - scrollView.contentInset.top;
+    CGFloat pulledHeight = -scrollView.contentOffset.y;
+    
+    if (@available(iOS 11, *)) {
+        pulledHeight -= scrollView.adjustedContentInset.top;
+    }
+    else {
+        pulledHeight -= scrollView.contentInset.top;
+    }
+    
+    return pulledHeight;
 }
 
 static void CommonInit(MUKPullToRevealControl *__nonnull me) {
@@ -448,6 +499,46 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
 
 #pragma mark - Private — Inset
 
+- (UIEdgeInsets)referenceInsetsOfScrollView:(nonnull UIScrollView *)scrollView {
+    if (@available(iOS 11, *)) {
+        return scrollView.safeAreaInsets;
+    }
+    else {
+        return self.originalContentInset;
+    }
+}
+
+- (UIEdgeInsets)revealedInsetsOfScrollView:(nonnull UIScrollView *)scrollView
+{
+    UIEdgeInsets inset;
+    
+    if (@available(iOS 11, *)) {
+        inset = scrollView.safeAreaInsets;
+        inset.top = self.revealHeight;
+    }
+    else {
+        inset = self.originalContentInset;
+        inset.top += self.revealHeight;
+    }
+    
+    return inset;
+}
+
+- (UIEdgeInsets)coveredInsetsOfScrollView:(nonnull UIScrollView *)scrollView
+{
+    UIEdgeInsets inset;
+    
+    if (@available(iOS 11, *)) {
+        inset = scrollView.safeAreaInsets;
+        inset.top = 0.0f;
+    }
+    else {
+        inset = self.originalContentInset;
+    }
+    
+    return inset;
+}
+
 - (void)setContentInset:(UIEdgeInsets)contentInset toScrollView:(UIScrollView *__nonnull)scrollView
 {
     if (!UIEdgeInsetsEqualToEdgeInsets(scrollView.contentInset, contentInset)) {
@@ -464,16 +555,40 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
             UIEdgeInsets inset = scrollView.contentInset;
             inset.top = ({
                 CGFloat top;
-                
-                if (-scrollView.contentOffset.y > self.originalContentInset.top) {
-                    top = -scrollView.contentOffset.y;
+                CGFloat const topThreshold = [self referenceInsetsOfScrollView:scrollView].top;
+
+                if (-scrollView.contentOffset.y > topThreshold) {
+                    // Top inset shrinks in order to follow scroll
+                    CGFloat offset;
+                    if (@available(iOS 11, *)) {
+                        offset = -topThreshold;
+                    }
+                    else {
+                        offset = 0.0f;
+                    }
+                    
+                    top = -scrollView.contentOffset.y + offset;
+                }
+                else if (@available(iOS 11, *)) {
+                    // Top inset no more shrinking to follow scroll
+                    top = 0.0f;
                 }
                 else {
+                    // Top inset no more shrinking to follow scroll
                     top = self.originalContentInset.top;
                 }
                 
-                if (top > self.revealHeight + self.originalContentInset.top) {
-                    top = self.revealHeight + self.originalContentInset.top;
+                // Cap top inset
+                CGFloat extensionCap;
+                if (@available(iOS 11, *)) {
+                    extensionCap = self.revealHeight;
+                }
+                else {
+                    extensionCap = self.revealHeight + self.originalContentInset.top;
+                }
+                
+                if (top > extensionCap) {
+                    top = extensionCap;
                 }
                 
                 top;

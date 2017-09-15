@@ -1,3 +1,5 @@
+platform :ios, '8.4'
+
 target 'MUKPullToRevealControl' do
   pod "MUKPullToRevealControl", :path => "../"
 end
