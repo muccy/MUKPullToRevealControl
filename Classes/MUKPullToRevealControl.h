@@ -46,6 +46,10 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
  Default: UIOffsetZero
  */
 @property (nonatomic) UIOffset positionOffset;
+
+/// @returns YES when originalTopInset is ignores. In that case
+/// internal implementation is updated to use safeAreaInsets (iOS 11+)
+@property (nonatomic, readonly) BOOL ignoresOriginalTopInset;
 /**
  The base inset where control returns when covered.
  You should update this value from you view controller if you plan to change top
@@ -60,8 +64,8 @@ typedef NS_ENUM(NSInteger, MUKPullToRevealControlState) {
     @c      [super viewDidLayoutSubviews];
     @c      self.pullToRevealControl.originalTopInset = self.topLayoutGuide.length;
     @c  }
- 
  }
+ @warning This is ignored in iOS 11+ because internal implementation is updated to use safeAreaInsets
  */
 @property (nonatomic) CGFloat originalTopInset;
 /**
