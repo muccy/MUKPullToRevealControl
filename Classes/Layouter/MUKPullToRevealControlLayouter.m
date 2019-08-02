@@ -8,6 +8,8 @@
 #import "MUKPullToRevealControlLayouter.h"
 #import "MUKPullToRevealControlScrollViewObserver.h"
 
+#define DEBUG_LOG_USER_STATES   0
+
 @interface MUKPullToRevealControlLayouter () <MUKPullToRevealControlScrollViewObserverDelegate>
 @property (nonatomic, readonly, nonnull) MUKPullToRevealControlScrollViewObserver *observer;
 @end
@@ -91,27 +93,23 @@
 - (void)touchesTrackerDidChangeValue:(MUKPullToRevealControlTouchesTracker *)tracker
 {
     if (!tracker.userIsTouching) {
-        if (self.revealState == MUKPullToRevealControlStatePulled) {
+        if (self.control.revealState == MUKPullToRevealControlStatePulled) {
         #if DEBUG_LOG_USER_STATES
-                NSLog(@"Reveal state = Revealed");
+            NSLog(@"Reveal state = Revealed");
         #endif
-                self.revealState = MUKPullToRevealControlStateRevealed;
+            [self.delegate layouter:self didRecognizeUserTouchLeadingToState:MUKPullToRevealControlStateRevealed];
                 
-                [UIView animateWithDuration:0.4 animations:^{
-                    UIScrollView *const scrollView = self.scrollView;
-                    [self updateContentInsetForContentOffsetChangeInScrollView:scrollView];
-                    [self updateFrameInScrollView:scrollView];
-                    [self updateContentViewFrameInScrollView:scrollView];
-                }];
-                
-                // Trigger control state
-                [self sendActionsForControlEvents:UIControlEventValueChanged];
-            }
+            [UIView animateWithDuration:0.4 animations:^{
+                [self.insetLayouter updateContentInsetForContentOffsetChange];
+                [self.frameLayouter updateFrame];
+                [self.frameLayouter updateContentViewFrame];
+            }];
             
-            // Consume job postponed after touch
-            if (self.jobAfterUserTouch) {
-                [self consumeJobAfterTouch];
-            }
+            // Trigger control state
+            [self.delegate layouterNeedsToSendControlActions:self];
+        }
+        
+        [self.delegate layouterDidConsumeUserTouch:self];
     }
 }
 

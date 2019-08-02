@@ -257,4 +257,22 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
     }
 }
 
+- (void)layouter:(MUKPullToRevealControlLayouter *)layouter didRecognizeUserTouchLeadingToState:(MUKPullToRevealControlState)state
+{
+    self.revealState = state;
+}
+
+- (void)layouterNeedsToSendControlActions:(MUKPullToRevealControlLayouter *)layouter
+{
+    [self sendActionsForControlEvents:UIControlEventValueChanged];
+}
+
+- (void)layouterDidConsumeUserTouch:(MUKPullToRevealControlLayouter *)layouter
+{
+    // Consume job postponed after touch
+    if (self.jobAfterUserTouch) {
+        [self consumeJobAfterTouch];
+    }
+}
+
 @end

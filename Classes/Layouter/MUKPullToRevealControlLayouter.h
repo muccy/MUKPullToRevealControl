@@ -19,6 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MUKPullToRevealControlLayouterDelegate <NSObject>
 @required
 - (void)layouter:(MUKPullToRevealControlLayouter *)layouter didChangePulledHeight:(CGFloat)pulledHeight;
+- (void)layouter:(MUKPullToRevealControlLayouter *)layouter didRecognizeUserTouchLeadingToState:(MUKPullToRevealControlState)state;
+- (void)layouterNeedsToSendControlActions:(MUKPullToRevealControlLayouter *)layouter;
+- (void)layouterDidConsumeUserTouch:(MUKPullToRevealControlLayouter *)layouter;
 @end
 
 @interface MUKPullToRevealControlLayouter : NSObject <MUKPullToRevealControlTouchesTrackerDelegate, MUKPullToRevealControlFrameLayouterDelegate>
