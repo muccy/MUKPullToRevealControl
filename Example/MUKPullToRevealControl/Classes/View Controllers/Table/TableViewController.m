@@ -26,6 +26,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    UIColor *backgroundColor;
+    if (@available(iOS 13, *)) {
+        backgroundColor = UIColor.systemBackgroundColor;
+    }
+    else {
+        backgroundColor = UIColor.whiteColor;
+    }
+    self.view.backgroundColor = backgroundColor;
+    
 #if DEBUG_OPAQUE_NAV_BAR
     self.navigationController.navigationBar.barTintColor = [UIColor lightGrayColor];
     self.navigationController.navigationBar.translucent = NO;

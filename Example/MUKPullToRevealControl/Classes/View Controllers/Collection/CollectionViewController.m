@@ -22,6 +22,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    UIColor *backgroundColor;
+    if (@available(iOS 13, *)) {
+        backgroundColor = UIColor.systemBackgroundColor;
+    }
+    else {
+        backgroundColor = UIColor.whiteColor;
+    }
+    self.collectionView.backgroundColor = backgroundColor;
+    
     MUKPullToRevealControl *const pullToRevealControl = [[MUKCirclePullToRefreshControl alloc] init];
     [self.collectionView addSubview:pullToRevealControl];
     self.pullToRevealControl = pullToRevealControl;
