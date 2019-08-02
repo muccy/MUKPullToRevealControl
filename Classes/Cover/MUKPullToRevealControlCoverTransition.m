@@ -24,7 +24,7 @@
 #pragma mark - Methods
 
 - (BOOL)canStart {
-    return self.control.state == MUKPullToRevealControlStateRevealed;
+    return self.control.revealState == MUKPullToRevealControlStateRevealed;
 }
 
 - (void)start {

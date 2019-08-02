@@ -15,8 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) MUKPullToRevealControlScroll *currentScroll;
 @property (nonatomic) BOOL loggingEnabled;
 
-- (void)startScroll:(MUKPullToRevealControlScroll *)scroll;
+- (instancetype)initWithScrollView:(UIScrollView *)scrollView NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 
+- (void)startScroll:(MUKPullToRevealControlScroll *)scroll;
 - (void)completeCurrentScrollForNewContentOffset:(CGPoint)newOffset;
 @end
 

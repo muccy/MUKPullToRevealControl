@@ -28,7 +28,7 @@
         _frameLayouter = [[MUKPullToRevealControlFrameLayouter alloc] initWithScrollView:scrollView control:control];
         _touchesTracker = [[MUKPullToRevealControlTouchesTracker alloc] initWithScrollView:scrollView];
         _observer = [[MUKPullToRevealControlScrollViewObserver alloc] initWithScrollView:scrollView];
-        _scrollRunner = [[MUKPullToRevealControlScrollRunner alloc] init];
+        _scrollRunner = [[MUKPullToRevealControlScrollRunner alloc] initWithScrollView:scrollView];
     }
     
     return self;

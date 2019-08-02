@@ -13,6 +13,17 @@
 
 @implementation MUKPullToRevealControlScrollRunner
 
+- (instancetype)initWithScrollView:(UIScrollView *)scrollView {
+    self = [super init];
+    if (self) {
+        _scrollView = scrollView;
+    }
+    
+    return self;
+}
+
+#pragma mark - Methods
+
 - (void)startScroll:(MUKPullToRevealControlScroll *)scroll {
     [self forceRunningScrollCompletion];
     
