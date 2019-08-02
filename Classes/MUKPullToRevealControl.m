@@ -1,5 +1,8 @@
 #import "MUKPullToRevealControl.h"
 #import <MUKSignal/MUKSignal.h>
+#import "MUKPullToRevealControlScroll.h"
+#import "MUKPullToRevealControlInsertion.h"
+#import "MUKPullToRevealControlRemoval.h"
 
 #define DEBUG_SHOW_BORDERS          0
 #define DEBUG_LOG_FRAME             0
@@ -7,34 +10,6 @@
 #define DEBUG_LOG_SCROLLS           0
 #define DEBUG_LOG_USER_STATES       0
 #define DEBUG_LOG_USER_TOUCHING_SV  0
-
-@interface MUKPullToRevealControlScroll : NSObject
-@property (nonatomic, readonly, copy) NSString *name;
-@property (nonatomic, readonly) CGPoint contentOffset;
-@property (nonatomic, readonly) BOOL animated;
-@property (nonatomic, readonly, nullable, copy) void (^completionHandler)(BOOL finished);
-
-- (instancetype)init NS_UNAVAILABLE;
-@end
-
-@implementation MUKPullToRevealControlScroll
-
-- (instancetype)initWithName:(NSString *)name contentOffset:(CGPoint)contentOffset animated:(BOOL)animated completionHandler:(void (^_Nullable)(BOOL finished))completionHandler
-{
-    self = [super init];
-    if (self) {
-        _name = name;
-        _contentOffset = contentOffset;
-        _animated = animated;
-        _completionHandler = [completionHandler copy];
-    }
-    
-    return self;
-}
-
-@end
-
-#pragma mark -
 
 @interface MUKPullToRevealControl ()
 @property (nonatomic, readwrite) MUKPullToRevealControlState revealState;
@@ -49,6 +24,8 @@
 
 @property (nonatomic, copy) dispatch_block_t jobAfterUserTouch;
 @property (nonatomic) MUKPullToRevealControlScroll *runningScroll;
+
+@property (nonatomic, nullable) MUKPullToRevealControlLayouter *layouter;
 @end
 
 @implementation MUKPullToRevealControl
@@ -83,27 +60,16 @@
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];
     
-    if ([newSuperview isKindOfClass:[UIScrollView class]]) {
-        // Adding
-        UIScrollView *const scrollView = (UIScrollView *)newSuperview;
-        self.originalContentInset = scrollView.contentInset;
-        
-        [self updateFrameInScrollView:scrollView];
-        [self updateContentViewFrameInScrollView:scrollView];
-        self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        
-        [self updateUserIsTouchingScrollView:scrollView];
-        [self observeScrollViewContentInset:scrollView];
-        [self observeScrollViewContentOffset:scrollView];
+    MUKPullToRevealControlInsertion *const insertion = [[MUKPullToRevealControlInsertion alloc] initWithControl:self superview:newSuperview];
+    
+    if (insertion.canStart) {
+        self.layouter = [insertion start];
+        [self.layouter start];
     }
-    else if ([self.superview isKindOfClass:[UIScrollView class]]) {
-        // Removing
-        UIScrollView *const oldScrollView = (UIScrollView *)self.superview;
-        [self unobserveScrollView:oldScrollView];
-        [self updateUserIsTouchingScrollView:nil];
-        
-        if (!self.ignoresOriginalTopInset) {
-            [self setContentInset:self.originalContentInset toScrollView:oldScrollView];
+    else {
+        MUKPullToRevealControlRemoval *const removal = [[MUKPullToRevealControlRemoval alloc] initWithSuperview:newSuperview layouter:self.layouter];
+        if (removal.canStart) {
+            [removal start];
         }
     }
 }
@@ -231,10 +197,10 @@
                 contentOffset.y = -newInset.top;
             }
             
-            MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"reveal" contentOffset:contentOffset animated:animated completionHandler:^(BOOL finished)
+            MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"reveal" contentOffset:contentOffset animated:animated loggingEnabled:DEBUG_LOG_SCROLLS completionHandler:^(BOOL finished)
             {
                 if (finished) {
-                    update();
+                   update();
                 }
             }];
             
@@ -284,7 +250,7 @@
                 contentOffset.y -= scrollView.safeAreaInsets.top;
             }
 
-            MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"cover" contentOffset:contentOffset animated:animated completionHandler:nil];
+            MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"cover" contentOffset:contentOffset animated:animated loggingEnabled:DEBUG_LOG_SCROLLS completionHandler:nil];
             
             if (self.userIsTouchingScrollView) {
                 // Postpone

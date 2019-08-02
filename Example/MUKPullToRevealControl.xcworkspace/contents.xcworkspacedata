@@ -1,21 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
-   <FileRef
-      location = "group:../MUKPullToRevealControl.podspec">
-   </FileRef>
-   <FileRef
-      location = "group:../Classes/MUKPullToRevealControl.h">
-   </FileRef>
-   <FileRef
-      location = "group:../Classes/MUKPullToRevealControl.m">
-   </FileRef>
-   <FileRef
-      location = "group:../Classes/MUKCirclePullToRefreshControl.h">
-   </FileRef>
-   <FileRef
-      location = "group:../Classes/MUKCirclePullToRefreshControl.m">
-   </FileRef>
+   <Group
+      location = "group:../Classes"
+      name = "Classes">
+      <FileRef
+         location = "group:MUKPullToRevealControl.h">
+      </FileRef>
+      <FileRef
+         location = "group:MUKPullToRevealControl.m">
+      </FileRef>
+      <Group
+         location = "group:Insertion"
+         name = "Insertion">
+         <FileRef
+            location = "group:MUKPullToRevealControlInsertion.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlInsertion.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Removal"
+         name = "Removal">
+         <FileRef
+            location = "group:MUKPullToRevealControlRemoval.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlRemoval.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Layouter"
+         name = "Layouter">
+         <FileRef
+            location = "group:MUKPullToRevealControlLayouter.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlLayouter.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Scroll"
+         name = "Scroll">
+         <FileRef
+            location = "group:MUKPullToRevealControlScroll.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlScroll.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Circle"
+         name = "Circle">
+         <FileRef
+            location = "group:MUKCirclePullToRefreshControl.m">
+         </FileRef>
+         <FileRef
+            location = "group:MUKCirclePullToRefreshControl.h">
+         </FileRef>
+      </Group>
+   </Group>
    <FileRef
       location = "group:MUKPullToRevealControl.xcodeproj">
    </FileRef>
