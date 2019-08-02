@@ -7,7 +7,11 @@
 
 #import "MUKPullToRevealControlLayouter.h"
 
+@interface MUKPullToRevealControlLayouter ()
+@end
+
 @implementation MUKPullToRevealControlLayouter
+
 
 - (instancetype)initWithScrollView:(UIScrollView *)scrollView control:(MUKPullToRevealControl *)control
 {
@@ -15,11 +19,17 @@
     if (self) {
         _scrollView = scrollView;
         _control = control;
-        _originalContentInset = scrollView.contentInset;
+        _insetLayouter = [[MUKPullToRevealControlContentInsetLayouter alloc] initWithScrollView:scrollView];
     }
     
     return self;
 }
+
+#pragma mark - Accessors
+
+
+
+#pragma mark - Methods
 
 - (void)start {
     [self updateFrameInScrollView:scrollView];
@@ -33,7 +43,13 @@
 }
 
 - (void)stop {
+    UIScrollView *const oldScrollView = (UIScrollView *)self.superview;
+    [self unobserveScrollView:oldScrollView];
+    [self updateUserIsTouchingScrollView:nil];
     
+    if (!self.ignoresOriginalTopInset) {
+        [self setContentInset:self.originalContentInset toScrollView:oldScrollView];
+    }
 }
 
 @end

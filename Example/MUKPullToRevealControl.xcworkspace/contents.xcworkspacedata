@@ -33,6 +33,16 @@
       <Group
          location = "group:Layouter"
          name = "Layouter">
+         <Group
+            location = "group:Content Inset"
+            name = "Content Inset">
+            <FileRef
+               location = "group:MUKPullToRevealControlContentInsetLayouter.h">
+            </FileRef>
+            <FileRef
+               location = "group:MUKPullToRevealControlContentInsetLayouter.m">
+            </FileRef>
+         </Group>
          <FileRef
             location = "group:MUKPullToRevealControlLayouter.h">
          </FileRef>
