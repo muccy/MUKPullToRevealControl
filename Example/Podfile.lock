@@ -1,19 +1,23 @@
 PODS:
-  - MUKPullToRevealControl (1.1.5):
-    - MUKSignal (~> 1.0.4)
+  - MUKPullToRevealControl (1.2.0):
+    - MUKSignal (~> 1.0.5)
   - MUKSignal (1.0.5)
 
 DEPENDENCIES:
   - MUKPullToRevealControl (from `../`)
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - MUKSignal
+
 EXTERNAL SOURCES:
   MUKPullToRevealControl:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
-  MUKPullToRevealControl: e2aad2f8e21df88dcb3d6f2a7a62eea47bfbb766
+  MUKPullToRevealControl: fc3a8ceea8918272fb937d7c5bc0c9ceeafcc046
   MUKSignal: 3b6f161c7337883d2d6570f0246ce460cb05373d
 
-PODFILE CHECKSUM: 46302d3143d880ab59e7b62cc161b2587f2c7a9f
+PODFILE CHECKSUM: faa3c70e489e6035e8e8e9551af173622321cbd0
 
-COCOAPODS: 1.3.1
+COCOAPODS: 1.7.2
