@@ -44,6 +44,16 @@
             </FileRef>
          </Group>
          <Group
+            location = "group:Frame"
+            name = "Frame">
+            <FileRef
+               location = "group:MUKPullToRevealControlFrameLayouter.h">
+            </FileRef>
+            <FileRef
+               location = "group:MUKPullToRevealControlFrameLayouter.m">
+            </FileRef>
+         </Group>
+         <Group
             location = "group:Touches Tracker"
             name = "Touches Tracker">
             <FileRef

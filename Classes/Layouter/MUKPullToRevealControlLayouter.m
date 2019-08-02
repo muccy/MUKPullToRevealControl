@@ -20,7 +20,7 @@
         _scrollView = scrollView;
         _control = control;
         _insetLayouter = [[MUKPullToRevealControlContentInsetLayouter alloc] initWithScrollView:scrollView control:control];
-        
+        _frameLayouter = [[MUKPullToRevealControlFrameLayouter alloc] initWithScrollView:scrollView control:control];
         _touchesTracker = [[MUKPullToRevealControlTouchesTracker alloc] initWithLoggingEnabled:NO];
     }
     
@@ -35,6 +35,7 @@
 
 - (void)start {
     [self.insetLayouter start];
+    [self.frameLayouter start];
     self.touchesTracker.delegate = self;
     
     
@@ -52,6 +53,7 @@
 
 - (void)stop {
     [self.insetLayouter stop];
+    [self.frameLayouter stop];
     self.touchesTracker.delegate = nil;
     
     

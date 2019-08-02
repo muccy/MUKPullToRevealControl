@@ -103,14 +103,7 @@
 }
 
 - (void)setPositionOffset:(UIOffset)positionOffset {
-    if (!UIOffsetEqualToOffset(positionOffset, _positionOffset)) {
-        _positionOffset = positionOffset;
-        
-        UIScrollView *const scrollView = self.scrollView;
-        if (scrollView) {
-            [self updateFrameInScrollView:scrollView];
-        }
-    }
+    self.layouter.frameLayouter.offset = positionOffset;
 }
 
 #pragma mark - Methods
