@@ -8,13 +8,13 @@
 #import "MUKPullToRevealControlContentInsetLayouter.h"
 
 @interface MUKPullToRevealControlContentInsetLayouter ()
-@property (nonatomic, readwrite) UIEdgeInsets original;
 @property (nonatomic, readwrite) BOOL isUpdatingContentInset;
 @end
 
 @implementation MUKPullToRevealControlContentInsetLayouter
 @dynamic ignoresOriginal;
 @dynamic originalTop;
+@dynamic revealed, covered;
 
 - (instancetype)initWithScrollView:(UIScrollView *)scrollView control:(MUKPullToRevealControl *)control
 {
@@ -66,6 +66,39 @@
     }
 }
 
+- (UIEdgeInsets)revealed {
+    UIEdgeInsets inset;
+    
+    if (@available(iOS 11, *)) {
+        inset = self.scrollView.safeAreaInsets;
+        inset.top = self.control.revealHeight;
+    }
+    else {
+        inset = self.original;
+        inset.top += self.control.revealHeight;
+    }
+    
+    return inset;
+}
+
+- (UIEdgeInsets)covered {
+    UIEdgeInsets inset;
+    
+    if (@available(iOS 11, *)) {
+        inset = self.scrollView.safeAreaInsets;
+        inset.top = 0.0f;
+    }
+    else {
+        inset = self.original;
+    }
+    
+    return inset;
+}
+
+- (BOOL)revealStateAffectsContentInset {
+    return self.control.revealState == MUKPullToRevealControlStateRevealed;
+}
+
 #pragma mark - Methods
 
 - (void)start {
@@ -73,37 +106,27 @@
 }
 
 - (void)stop {
-    
-}
-
-#pragma mark - Private
-
-- (BOOL)revealStateAffectsContentInset {
-    return self.control.revealState == MUKPullToRevealControlStateRevealed;
-}
-
-- (BOOL)contentInsetRespectsCoveredRevealState {
-    return self.control.revealState == MUKPullToRevealControlStateCovered && self.scrollView.contentInset.top == self.original.top;
-}
-
-- (UIEdgeInsets)referenceInsets {
-    if (@available(iOS 11, *)) {
-        return self.scrollView.safeAreaInsets;
-    }
-    else {
-        return self.original;
+    if (!self.ignoresOriginal) {
+        [self updateContentInset:self.original];
     }
 }
 
-- (void)updateContentInsetForContentOffsetChangeInScrollView:(UIScrollView *)scrollView
-{
+- (void)updateContentInset:(UIEdgeInsets)contentInset {
+    if (!UIEdgeInsetsEqualToEdgeInsets(self.scrollView.contentInset, contentInset)) {
+        self.isUpdatingContentInset = YES;
+        self.scrollView.contentInset = contentInset;
+        self.isUpdatingContentInset = NO;
+    }
+}
+
+- (void)updateContentInsetForContentOffsetChange {
     if (!self.isUpdatingContentInset) {
-        UIEdgeInsets inset = scrollView.contentInset;
+        UIEdgeInsets inset = self.scrollView.contentInset;
         inset.top = ({
             CGFloat top;
             CGFloat const topThreshold = self.referenceInsets.top;
 
-            if (-scrollView.contentOffset.y > topThreshold) {
+            if (-self.scrollView.contentOffset.y > topThreshold) {
                 // Top inset shrinks in order to follow scroll
                 CGFloat offset;
                 if (@available(iOS 11, *)) {
@@ -113,7 +136,7 @@
                     offset = 0.0f;
                 }
                 
-                top = -scrollView.contentOffset.y + offset;
+                top = -self.scrollView.contentOffset.y + offset;
             }
             else if (@available(iOS 11, *)) {
                 // Top inset no more shrinking to follow scroll
@@ -144,11 +167,18 @@
     }
 }
 
-- (void)updateContentInset:(UIEdgeInsets)contentInset {
-    if (!UIEdgeInsetsEqualToEdgeInsets(self.scrollView.contentInset, contentInset)) {
-        self.isUpdatingContentInset = YES;
-        self.scrollView.contentInset = contentInset;
-        self.isUpdatingContentInset = NO;
+#pragma mark - Private
+
+- (BOOL)contentInsetRespectsCoveredRevealState {
+    return self.control.revealState == MUKPullToRevealControlStateCovered && self.scrollView.contentInset.top == self.original.top;
+}
+
+- (UIEdgeInsets)referenceInsets {
+    if (@available(iOS 11, *)) {
+        return self.scrollView.safeAreaInsets;
+    }
+    else {
+        return self.original;
     }
 }
 

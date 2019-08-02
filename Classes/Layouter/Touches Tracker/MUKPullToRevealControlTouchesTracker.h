@@ -16,12 +16,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MUKPullToRevealControlTouchesTracker : NSObject
-@property (nonatomic, readwrite) BOOL userIsTouching;
-@property (nonatomic, readonly) BOOL loggingEnabled;
+@property (nonatomic, readonly, weak) UIScrollView *scrollView;
+@property (nonatomic) BOOL userIsTouching;
+@property (nonatomic) BOOL loggingEnabled;
 @property (nonatomic, weak) id<MUKPullToRevealControlTouchesTrackerDelegate> delegate;
 
-- (instancetype)initWithLoggingEnabled:(BOOL)loggingEnabled NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithScrollView:(UIScrollView *)scrollView NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
+
+- (void)start;
+- (void)stop;
+
+- (void)update;
 @end
 
 NS_ASSUME_NONNULL_END

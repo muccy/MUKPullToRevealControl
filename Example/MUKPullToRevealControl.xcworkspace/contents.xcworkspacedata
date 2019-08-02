@@ -71,6 +71,26 @@
          </FileRef>
       </Group>
       <Group
+         location = "group:Reveal"
+         name = "Reveal">
+         <FileRef
+            location = "group:MUKPullToRevealControlRevealTransition.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlRevealTransition.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Cover"
+         name = "Cover">
+         <FileRef
+            location = "group:MUKPullToRevealControlCoverTransition.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlCoverTransition.m">
+         </FileRef>
+      </Group>
+      <Group
          location = "group:Scroll"
          name = "Scroll">
          <FileRef
@@ -78,6 +98,16 @@
          </FileRef>
          <FileRef
             location = "group:MUKPullToRevealControlScroll.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Scroll View Observer"
+         name = "Scroll View Observer">
+         <FileRef
+            location = "group:MUKPullToRevealControlScrollViewObserver.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlScrollViewObserver.m">
          </FileRef>
       </Group>
       <Group

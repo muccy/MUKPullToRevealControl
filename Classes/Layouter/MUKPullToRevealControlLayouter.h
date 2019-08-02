@@ -10,15 +10,24 @@
 #import <MUKPullToRevealControl/MUKPullToRevealControlContentInsetLayouter.h>
 #import <MUKPullToRevealControl/MUKPullToRevealControlFrameLayouter.h>
 #import <MUKPullToRevealControl/MUKPullToRevealControlTouchesTracker.h>
+#import <MUKPullToRevealControl/MUKPullToRevealControlRevealTransition.h>
+#import <MUKPullToRevealControl/MUKPullToRevealControlCoverTransition.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MUKPullToRevealControlLayouter : NSObject <MUKPullToRevealControlTouchesTrackerDelegate>
+@class MUKPullToRevealControlLayouter;
+@protocol MUKPullToRevealControlLayouterDelegate <NSObject>
+@required
+- (void)layouter:(MUKPullToRevealControlLayouter *)layouter didChangePulledHeight:(CGFloat)pulledHeight;
+@end
+
+@interface MUKPullToRevealControlLayouter : NSObject <MUKPullToRevealControlTouchesTrackerDelegate, MUKPullToRevealControlFrameLayouterDelegate>
 @property (nonatomic, readonly, weak) UIScrollView *scrollView;
 @property (nonatomic, readonly, weak) MUKPullToRevealControl *control;
 @property (nonatomic, readonly) MUKPullToRevealControlContentInsetLayouter *insetLayouter;
 @property (nonatomic, readonly) MUKPullToRevealControlFrameLayouter *frameLayouter;
 @property (nonatomic, readonly) MUKPullToRevealControlTouchesTracker *touchesTracker;
+@property (nonatomic, weak) id<MUKPullToRevealControlLayouterDelegate> delegate;
 
 - (instancetype)initWithScrollView:(UIScrollView *)scrollView control:(MUKPullToRevealControl *)control NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;

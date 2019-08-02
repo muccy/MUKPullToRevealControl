@@ -9,10 +9,10 @@
 
 @implementation MUKPullToRevealControlTouchesTracker
 
-- (instancetype)initWithLoggingEnabled:(BOOL)loggingEnabled {
+- (instancetype)initWithScrollView:(UIScrollView *)scrollView {
     self = [super init];
     if (self) {
-        _loggingEnabled = loggingEnabled;
+        _scrollView = scrollView;
     }
     
     return self;
@@ -29,6 +29,24 @@
         }
             
         [self.delegate touchesTrackerDidChangeValue:self];
+    }
+}
+
+#pragma mark - Methods
+
+- (void)start {
+    [self update];
+}
+
+- (void)stop {
+    self.userIsTouching = NO;
+}
+
+- (void)update {
+    BOOL const userIsTouchingScrollView = self.scrollView.isDragging || self.scrollView.isTracking;
+    
+    if (userIsTouchingScrollView != self.userIsTouching) {
+        self.userIsTouching = userIsTouchingScrollView;
     }
 }
 
