@@ -53,7 +53,15 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     CollectionViewCell *const cell = (CollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:@"Cell" forIndexPath:indexPath];
-    cell.backgroundColor = [UIColor colorWithWhite:0.95f alpha:1.0f];
+    
+    UIColor *backgroundColor;
+    if (@available(iOS 13, *)) {
+        backgroundColor = UIColor.tertiarySystemBackgroundColor;
+    }
+    else {
+        backgroundColor = [UIColor colorWithWhite:0.95f alpha:1.0f];
+    }
+    cell.backgroundColor = backgroundColor;
     
     if (indexPath.item < self.actions.count) {
         Action *const action = self.actions[indexPath.item];
@@ -62,6 +70,15 @@
     else {
         cell.textLabel.text = [NSString stringWithFormat:@"%li", (long)indexPath.item];
     }
+    
+    UIColor *textColor;
+    if (@available(iOS 13, *)) {
+        textColor = UIColor.labelColor;
+    }
+    else {
+        textColor = UIColor.darkTextColor;
+    }
+    cell.textLabel.textColor = textColor;
     
     return cell;
 }

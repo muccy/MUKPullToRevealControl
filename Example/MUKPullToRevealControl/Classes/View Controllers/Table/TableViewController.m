@@ -102,6 +102,15 @@
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     
+    UIColor *textColor;
+    if (@available(iOS 13, *)) {
+        textColor = UIColor.labelColor;
+    }
+    else {
+        textColor = UIColor.darkTextColor;
+    }
+    cell.textLabel.textColor = textColor;
+    
     return cell;
 }
 
