@@ -178,7 +178,15 @@ static void CommonInit(MUKCirclePullToRefreshControl *__nonnull me) {
 - (void)insertActivityIndicatorViewIfNeededAlignedWithCircleView:(MUKCirclePullToRefreshControlCircleView *__nonnull)circleView
 {
     if (!self.activityIndicatorView) {
-        UIActivityIndicatorView *view = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        UIActivityIndicatorView *view;
+        if (@available(iOS 13, *)) {
+            view = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+            view.color = UIColor.systemGray2Color;
+        }
+        else {
+            view = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        }
+        
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [self.contentView addSubview:view];
         self.activityIndicatorView = view;
