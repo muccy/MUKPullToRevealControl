@@ -9,6 +9,19 @@
 
 @implementation MUKPullToRevealControlRevealTransition
 
+- (instancetype)initWithLayouter:(MUKPullToRevealControlLayouter *)layouter animated:(BOOL)animated
+{
+    self = [super init];
+    if (self) {
+        _layouter = layouter;
+        _animated = animated;
+    }
+    
+    return self;
+}
+
+#pragma mark - Methods
+
 + (BOOL)isValidFromState:(MUKPullToRevealControlState)state {
     return state != MUKPullToRevealControlStateRevealed;
 }
@@ -16,29 +29,30 @@
 - (void)start {
     UIEdgeInsets const newInset = self.layouter.insetLayouter.revealed;
 
-    __weak typeof(self) weakSelf = self;
-
     if ([self shouldScrollWithNewInset:newInset]) {
         CGPoint contentOffset = [self contentOffsetWithNewInset:newInset];
         
-        MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"reveal" contentOffset:contentOffset animated:animated loggingEnabled:DEBUG_LOG_SCROLLS completionHandler:^(BOOL finished)
+        __weak typeof(self) weakSelf = self;
+        MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"reveal" contentOffset:contentOffset animated:self.animated completionHandler:^(BOOL finished)
         {
             if (finished) {
-               update();
+                typeof(weakSelf) strongSelf = weakSelf;
+                [strongSelf updateLayoutWithNewInset:newInset];
             }
         }];
         
-        [self performScroll:scroll onScrollView:scrollView];
+        [self.layouter.scrollRunner startScroll:scroll];
     }
     else {
-        update();
+        [self updateLayoutWithNewInset:newInset];
         
         if (@available(iOS 11, *)) {
             // Don't wait first user scroll in order to adjust insets
-            [self updateContentInsetForContentOffsetChangeInScrollView:scrollView];
+            [self.layouter.insetLayouter updateContentInsetForContentOffsetChange];
         }
     }
     
+    [self.delegate revealTransitionIsReadyToChangeControlState:self];
 }
 
 #pragma mark - Private

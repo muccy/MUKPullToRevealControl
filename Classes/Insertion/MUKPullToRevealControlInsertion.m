@@ -27,7 +27,7 @@
 - (MUKPullToRevealControlLayouter *)start {
     UIScrollView *const scrollView = (UIScrollView *)self.superview;
     
-    MUKPullToRevealControlLayouter *const layouter = [[MUKPullToRevealControlLayouter alloc] initWithScrollView:scrollView];    
+    MUKPullToRevealControlLayouter *const layouter = [[MUKPullToRevealControlLayouter alloc] initWithScrollView:scrollView control:self.control];    
     return layouter;
 }
 

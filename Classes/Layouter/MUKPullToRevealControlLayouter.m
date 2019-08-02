@@ -8,8 +8,6 @@
 #import "MUKPullToRevealControlLayouter.h"
 #import "MUKPullToRevealControlScrollViewObserver.h"
 
-#define DEBUG_LOG_USER_STATES   0
-
 @interface MUKPullToRevealControlLayouter () <MUKPullToRevealControlScrollViewObserverDelegate>
 @property (nonatomic, readonly, nonnull) MUKPullToRevealControlScrollViewObserver *observer;
 @end
@@ -30,14 +28,11 @@
         _frameLayouter = [[MUKPullToRevealControlFrameLayouter alloc] initWithScrollView:scrollView control:control];
         _touchesTracker = [[MUKPullToRevealControlTouchesTracker alloc] initWithScrollView:scrollView];
         _observer = [[MUKPullToRevealControlScrollViewObserver alloc] initWithScrollView:scrollView];
+        _scrollRunner = [[MUKPullToRevealControlScrollRunner alloc] init];
     }
     
     return self;
 }
-
-#pragma mark - Accessors
-
-
 
 #pragma mark - Methods
 
@@ -94,9 +89,6 @@
 {
     if (!tracker.userIsTouching) {
         if (self.control.revealState == MUKPullToRevealControlStatePulled) {
-        #if DEBUG_LOG_USER_STATES
-            NSLog(@"Reveal state = Revealed");
-        #endif
             [self.delegate layouter:self didRecognizeUserTouchLeadingToState:MUKPullToRevealControlStateRevealed];
                 
             [UIView animateWithDuration:0.4 animations:^{
@@ -131,13 +123,8 @@
     // Update user is touching
     [self.touchesTracker update];
     
-    // TODO: Manage manual scrolling completion
-    if (strongSelf.runningScroll) {
-        if (CGPointEqualToPoint(strongSelf.runningScroll.contentOffset, newOffset))
-        {
-            [strongSelf didCompleteScroll:strongSelf.runningScroll finished:YES];
-        }
-    }
+    // Manage manual scrolling completion
+    [self.scrollRunner completeCurrentScrollForNewContentOffset:newOffset];
     
     if (self.insetLayouter.revealStateAffectsContentInset) {
         // This helps to place table sections headers better

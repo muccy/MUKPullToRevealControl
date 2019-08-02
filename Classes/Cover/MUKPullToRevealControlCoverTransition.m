@@ -9,61 +9,97 @@
 
 @implementation MUKPullToRevealControlCoverTransition
 
-+ (BOOL)isValidFromState:(MUKPullToRevealControlState)state {
-    return state == MUKPullToRevealControlStateRevealed;
+- (instancetype)initWithLayouter:(MUKPullToRevealControlLayouter *)layouter control:(MUKPullToRevealControl *)control animated:(BOOL)animated
+{
+    self = [super init];
+    if (self) {
+        _layouter = layouter;
+        _control = control;
+        _animated = animated;
+    }
+    
+    return self;
+}
+
+#pragma mark - Methods
+
+- (BOOL)canStart {
+    return self.control.state == MUKPullToRevealControlStateRevealed;
 }
 
 - (void)start {
-    UIScrollView *const scrollView = self.scrollView;
-    UIEdgeInsets const newInset = [self coveredInsetsOfScrollView:scrollView];
+    UIEdgeInsets const newInset = self.layouter.insetLayouter.covered;
+    
+    [self.delegate coverTransitionIsReadyToChangeControlState:self];
 
-    self.revealState = MUKPullToRevealControlStateCovered;
-    [UIView animateWithDuration:animated ? 0.4 : 0.0 animations:^{
-        [self setContentInset:newInset toScrollView:scrollView];
-        [self updateFrameInScrollView:scrollView];
-        [self updateContentViewFrameInScrollView:scrollView];
+    [UIView animateWithDuration:self.animated ? 0.4 : 0.0 animations:^{
+        [self updateLayoutWithNewInset:newInset];
     }];
     
-    CGFloat const yOffsetAfterRunningScroll = scrollView.contentOffset.y + self.runningScroll.contentOffset.y;
-    
-    CGFloat scrollThreshold;
-    if (@available(iOS 11, *)) {
-        scrollThreshold = -scrollView.safeAreaInsets.top;
-    }
-    else {
-        scrollThreshold = -scrollView.contentInset.top;
-    }
-    
-    BOOL const shouldScroll = yOffsetAfterRunningScroll < scrollThreshold;
-    if (shouldScroll) {
-        CGPoint contentOffset = scrollView.contentOffset;
-        contentOffset.y = -newInset.top;
-        
-        if (@available(iOS 11, *)) {
-            contentOffset.y -= scrollView.safeAreaInsets.top;
-        }
+    if (self.shouldScroll) {
+        CGPoint contentOffset = [self contentOffsetWithNewInset:newInset];
 
-        MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"cover" contentOffset:contentOffset animated:animated loggingEnabled:DEBUG_LOG_SCROLLS completionHandler:nil];
+        MUKPullToRevealControlScroll *const scroll = [[MUKPullToRevealControlScroll alloc] initWithName:@"cover" contentOffset:contentOffset animated:self.animated completionHandler:nil];
         
-        if (self.userIsTouchingScrollView) {
+        if (self.shouldPostponeScroll) {
             // Postpone
             __weak typeof(self) weakSelf = self;
-            __weak __typeof__(scrollView) weakScrollView = scrollView;
 
-            [self addJobAfterUserTouch:^{
+            dispatch_block_t const job = ^{
                 __strong __typeof(weakSelf) strongSelf = weakSelf;
-                __strong __typeof__(weakScrollView) strongScrollView = weakScrollView;
 
-                if (strongSelf.revealState == MUKPullToRevealControlStateCovered)
+                if (strongSelf.control.revealState == MUKPullToRevealControlStateCovered)
                 {
-                    [strongSelf performScroll:scroll onScrollView:strongScrollView];
+                    [strongSelf.layouter.scrollRunner startScroll:scroll];
                 }
-            }];
+            };
+            
+            [self.delegate coverTransition:self needsToPostponeAfterUserTouchJob:[job copy]];
         }
         else {
-            [self performScroll:scroll onScrollView:scrollView];
+            [self.layouter.scrollRunner startScroll:scroll];
         }
     } // if shouldScroll
+}
+
+#pragma mark - Private
+
+- (void)updateLayoutWithNewInset:(UIEdgeInsets)newInset {
+    [self.layouter.insetLayouter updateContentInset:newInset];
+    [self.layouter.frameLayouter updateFrame];
+    [self.layouter.frameLayouter updateContentViewFrame];
+}
+
+- (CGFloat)YOffsetAfterRunningScroll {
+    return self.layouter.scrollView.contentOffset.y + self.layouter.scrollRunner.currentScroll.contentOffset.y;
+}
+
+- (CGFloat)scrollThreshold {
+    if (@available(iOS 11, *)) {
+        return -self.layouter.scrollView.safeAreaInsets.top;
+    }
+    else {
+        return -self.layouter.scrollView.contentInset.top;
+    }
+}
+
+- (BOOL)shouldScroll {
+    return self.YOffsetAfterRunningScroll < self.scrollThreshold;
+}
+
+- (CGPoint)contentOffsetWithNewInset:(UIEdgeInsets)newInset {
+    CGPoint contentOffset = self.layouter.scrollView.contentOffset;
+    contentOffset.y = -newInset.top;
+    
+    if (@available(iOS 11, *)) {
+        contentOffset.y -= self.layouter.scrollView.safeAreaInsets.top;
+    }
+    
+    return contentOffset;
+}
+
+- (BOOL)shouldPostponeScroll {
+    return self.layouter.touchesTracker.userIsTouching;
 }
 
 @end

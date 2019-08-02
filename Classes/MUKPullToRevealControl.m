@@ -1,19 +1,17 @@
 #import "MUKPullToRevealControl.h"
-#import "MUKPullToRevealControlScroll.h"
 #import "MUKPullToRevealControlInsertion.h"
 #import "MUKPullToRevealControlRemoval.h"
+#import "MUKPullToRevealControlRevealTransition.h"
+#import "MUKPullToRevealControlCoverTransition.h"
 
 #define DEBUG_SHOW_BORDERS          0
 #define DEBUG_LOG_USER_STATES       0
 
-@interface MUKPullToRevealControl () <MUKPullToRevealControlLayouterDelegate>
+@interface MUKPullToRevealControl () <MUKPullToRevealControlLayouterDelegate, MUKPullToRevealControlRevealTransitionDelegate, MUKPullToRevealControlCoverTransitionDelegate>
 @property (nonatomic, readwrite) MUKPullToRevealControlState revealState;
 
 
-@property (nonatomic) NSValue *trackedContentInset, *trackedContentOffset;
-
 @property (nonatomic, copy) dispatch_block_t jobAfterUserTouch;
-@property (nonatomic) MUKPullToRevealControlScroll *runningScroll;
 
 @property (nonatomic, nullable) MUKPullToRevealControlLayouter *layouter;
 @end
@@ -92,16 +90,19 @@
 #pragma mark - Methods
 
 - (void)revealAnimated:(BOOL)animated {
-    if (self.revealState != MUKPullToRevealControlStateRevealed) {
-        // TODO: transition
-        
-        self.revealState = MUKPullToRevealControlStateRevealed;
+    if ([MUKPullToRevealControlRevealTransition isValidFromState:self.revealState])
+    {
+        MUKPullToRevealControlRevealTransition *const transition = [[MUKPullToRevealControlRevealTransition alloc] initWithLayouter:self.layouter animated:animated];
+        transition.delegate = self;
+        [transition start];
     }
 }
 
 - (void)coverAnimated:(BOOL)animated {
-    if (self.revealState == MUKPullToRevealControlStateRevealed) {
-        // TODO: transition
+    MUKPullToRevealControlCoverTransition *const transition = [[MUKPullToRevealControlCoverTransition alloc] initWithLayouter:self.layouter control:self animated:animated];
+    if (transition.canStart) {
+        transition.delegate = self;
+        [transition start];
     }
 }
 
@@ -133,57 +134,6 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
     contentView.layer.borderWidth = 1.0f;
     contentView.layer.borderColor = [UIColor blueColor].CGColor;
 #endif
-}
-
-#pragma mark - Private - Scroll
-
-- (void)performScroll:(MUKPullToRevealControlScroll *__nonnull)scroll onScrollView:(UIScrollView *__nonnull)scrollView
-{
-    [self forceRunningScrollCompletion];
-    
-#if DEBUG_LOG_SCROLLS
-    NSLog(@"Performing scroll to y = %f", scroll.contentOffset.y);
-#endif
-    
-    self.runningScroll = scroll;
-    [scrollView setContentOffset:scroll.contentOffset animated:scroll.animated];
-    
-    // Watchdog
-    __weak typeof(self) weakSelf = self;
-    __weak typeof(scroll) weakScroll = scroll;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        __strong __typeof(weakSelf) strongSelf = weakSelf;
-        __strong __typeof(weakScroll) strongScroll = weakScroll;
-        
-        if (strongSelf && strongScroll && [strongScroll isEqual:strongSelf.runningScroll])
-        {
-#if DEBUG_LOG_SCROLLS
-            NSLog(@"Watchdog is cancelling running scroll to y = %f", strongScroll.contentOffset.y);
-#endif
-            [strongSelf didCompleteScroll:strongScroll finished:NO];
-        }
-    });
-}
-
-- (void)didCompleteScroll:(MUKPullToRevealControlScroll *__nonnull)scroll finished:(BOOL)finished
-{
-    if ([scroll isEqual:self.runningScroll]) {
-        self.runningScroll = nil;
-    }
-    
-    if (scroll.completionHandler) {
-        scroll.completionHandler(finished);
-    }
-    
-#if DEBUG_LOG_SCROLLS
-    NSLog(@"Completed scroll to y = %f (finished = %@)", scroll.contentOffset.y, finished ? @"Y" : @"N");
-#endif
-}
-
-- (void)forceRunningScrollCompletion {
-    if (self.runningScroll) {
-        [self didCompleteScroll:self.runningScroll finished:NO];
-    }
 }
 
 #pragma mark - Private — User Touch
@@ -273,6 +223,25 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
     if (self.jobAfterUserTouch) {
         [self consumeJobAfterTouch];
     }
+}
+
+#pragma mark - <MUKPullToRevealControlRevealTransitionDelegate>
+
+- (void)revealTransitionIsReadyToChangeControlState:(MUKPullToRevealControlRevealTransition *)transition
+{
+    self.revealState = MUKPullToRevealControlStateRevealed;
+}
+
+#pragma mark - <MUKPullToRevealControlCoverTransitionDelegate>
+
+- (void)coverTransitionIsReadyToChangeControlState:(MUKPullToRevealControlCoverTransition *)transition
+{
+    self.revealState = MUKPullToRevealControlStateCovered;
+}
+
+- (void)coverTransition:(MUKPullToRevealControlCoverTransition *)transition needsToPostponeAfterUserTouchJob:(dispatch_block_t)job
+{
+    [self addJobAfterUserTouch:job];
 }
 
 @end

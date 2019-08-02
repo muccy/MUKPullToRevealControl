@@ -93,6 +93,16 @@
       <Group
          location = "group:Scroll"
          name = "Scroll">
+         <Group
+            location = "group:Runner"
+            name = "Runner">
+            <FileRef
+               location = "group:MUKPullToRevealControlScrollRunner.h">
+            </FileRef>
+            <FileRef
+               location = "group:MUKPullToRevealControlScrollRunner.m">
+            </FileRef>
+         </Group>
          <FileRef
             location = "group:MUKPullToRevealControlScroll.h">
          </FileRef>

@@ -53,7 +53,7 @@
     
     if (!self.ignoresOriginal) {
         if (self.revealStateAffectsContentInset) {
-            [self updateContentInsetForContentOffsetChangeInScrollView:self.scrollView];
+            [self updateContentInsetForContentOffsetChange];
         }
         else if (![self contentInsetRespectsCoveredRevealState]) {
             // Useful when reveal/cover is performed out of screen (e.g.: in a previous
