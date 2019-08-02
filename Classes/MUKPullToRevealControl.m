@@ -9,14 +9,12 @@
 #define DEBUG_LOG_CONTENT_INSET     0
 #define DEBUG_LOG_SCROLLS           0
 #define DEBUG_LOG_USER_STATES       0
-#define DEBUG_LOG_USER_TOUCHING_SV  0
 
 @interface MUKPullToRevealControl ()
 @property (nonatomic, readwrite) MUKPullToRevealControlState revealState;
 
 @property (nonatomic, readonly, nullable) MUKSignalObservation<MUKKVOSignal *> *scrollViewContentInsetObservation, *scrollViewContentOffsetObservation;
 
-@property (nonatomic) BOOL userIsTouchingScrollView;
 @property (nonatomic) NSValue *trackedContentInset, *trackedContentOffset;
 
 @property (nonatomic, copy) dispatch_block_t jobAfterUserTouch;
@@ -101,21 +99,6 @@
         
         // React
         [self didChangeRevealStateFromState:oldState];
-    }
-}
-
-- (void)setUserIsTouchingScrollView:(BOOL)userIsTouchingScrollView {
-    if (userIsTouchingScrollView != _userIsTouchingScrollView) {
-        _userIsTouchingScrollView = userIsTouchingScrollView;
-        
-#if DEBUG_LOG_USER_TOUCHING_SV
-        NSLog(@"User is touching scroll view? %@", userIsTouchingScrollView ? @"Y" : @"N");
-#endif
-        
-        // React
-        if (!userIsTouchingScrollView) {
-            [self userFinishedToTouchScrollView];
-        }
     }
 }
 
@@ -411,29 +394,6 @@ static void CommonInit(MUKPullToRevealControl *__nonnull me) {
     }
 }
 
-- (void)userFinishedToTouchScrollView {
-    if (self.revealState == MUKPullToRevealControlStatePulled) {
-#if DEBUG_LOG_USER_STATES
-        NSLog(@"Reveal state = Revealed");
-#endif
-        self.revealState = MUKPullToRevealControlStateRevealed;
-        
-        [UIView animateWithDuration:0.4 animations:^{
-            UIScrollView *const scrollView = self.scrollView;
-            [self updateContentInsetForContentOffsetChangeInScrollView:scrollView];
-            [self updateFrameInScrollView:scrollView];
-            [self updateContentViewFrameInScrollView:scrollView];
-        }];
-        
-        // Trigger control state
-        [self sendActionsForControlEvents:UIControlEventValueChanged];
-    }
-    
-    // Consume job postponed after touch
-    if (self.jobAfterUserTouch) {
-        [self consumeJobAfterTouch];
-    }
-}
 
 #pragma mark - Private — Inset
 

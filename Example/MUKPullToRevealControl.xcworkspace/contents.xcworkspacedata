@@ -43,6 +43,16 @@
                location = "group:MUKPullToRevealControlContentInsetLayouter.m">
             </FileRef>
          </Group>
+         <Group
+            location = "group:Touches Tracker"
+            name = "Touches Tracker">
+            <FileRef
+               location = "group:MUKPullToRevealControlTouchesTracker.h">
+            </FileRef>
+            <FileRef
+               location = "group:MUKPullToRevealControlTouchesTracker.m">
+            </FileRef>
+         </Group>
          <FileRef
             location = "group:MUKPullToRevealControlLayouter.h">
          </FileRef>

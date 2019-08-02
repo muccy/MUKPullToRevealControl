@@ -8,13 +8,15 @@
 #import <Foundation/Foundation.h>
 #import <MUKPullToRevealControl/MUKPullToRevealControl.h>
 #import <MUKPullToRevealControl/MUKPullToRevealControlContentInsetLayouter.h>
+#import <MUKPullToRevealControl/MUKPullToRevealControlTouchesTracker.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MUKPullToRevealControlLayouter : NSObject
+@interface MUKPullToRevealControlLayouter : NSObject <MUKPullToRevealControlTouchesTrackerDelegate>
 @property (nonatomic, readonly, weak) UIScrollView *scrollView;
 @property (nonatomic, readonly, weak) MUKPullToRevealControl *control;
 @property (nonatomic, readonly) MUKPullToRevealControlContentInsetLayouter *insetLayouter;
+@property (nonatomic, readonly) MUKPullToRevealControlTouchesTracker *touchesTracker;
 
 - (instancetype)initWithScrollView:(UIScrollView *)scrollView control:(MUKPullToRevealControl *)control NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
