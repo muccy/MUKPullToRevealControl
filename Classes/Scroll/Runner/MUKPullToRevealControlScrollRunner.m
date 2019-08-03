@@ -32,12 +32,19 @@
     }
     
     self.currentScroll = scroll;
-    [self.scrollView setContentOffset:scroll.contentOffset animated:scroll.animated];
+    
+    // -setContentOffset:animated: is not reliable. For example, in iOS 13b5 it does not work
+    // in UITableView, using animation
+    // @see: https://stackoverflow.com/a/54920445
+    NSTimeInterval const duration = scroll.animated ? 0.3 : 0.0;
+    [UIView animateWithDuration:duration animations:^{
+        [self.scrollView setContentOffset:scroll.contentOffset animated:NO];
+    }];
     
     // Watchdog
     __weak typeof(self) weakSelf = self;
     __weak typeof(scroll) weakScroll = scroll;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)((duration + 0.05) * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         __strong __typeof(weakSelf) strongSelf = weakSelf;
         __strong __typeof(weakScroll) strongScroll = weakScroll;
         if (strongScroll) {
