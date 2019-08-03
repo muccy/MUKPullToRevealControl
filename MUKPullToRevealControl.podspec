@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.source_files = 'Classes/**/*.{h,m}'
-  s.public_header_files = 'Classes/MUKPullToRevealControl.{h,m}', 'Classes/Circle/*.{h,m}'
+  s.public_header_files = 'Classes/MUKPullToRevealControl.h', 'Classes/Circle/*.h'
   s.compiler_flags  = '-Wdocumentation'
   
   s.dependency  'MUKSignal', '~> 1.0.5'
