@@ -26,6 +26,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    UIColor *backgroundColor;
+    if (@available(iOS 13, *)) {
+        backgroundColor = UIColor.systemBackgroundColor;
+    }
+    else {
+        backgroundColor = UIColor.whiteColor;
+    }
+    self.view.backgroundColor = backgroundColor;
+    
 #if DEBUG_OPAQUE_NAV_BAR
     self.navigationController.navigationBar.barTintColor = [UIColor lightGrayColor];
     self.navigationController.navigationBar.translucent = NO;
@@ -92,6 +101,15 @@
         cell.textLabel.text = [NSString stringWithFormat:@"%li", (long)indexPath.row];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
+    
+    UIColor *textColor;
+    if (@available(iOS 13, *)) {
+        textColor = UIColor.labelColor;
+    }
+    else {
+        textColor = UIColor.darkTextColor;
+    }
+    cell.textLabel.textColor = textColor;
     
     return cell;
 }

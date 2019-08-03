@@ -1,5 +1,7 @@
 #import "MUKCirclePullToRefreshControl.h"
 
+#define DEBUG_PULL_HEIGHT_PROGRESS  0
+
 @interface MUKCirclePullToRefreshControlCircleView : UIView
 @property (nonatomic) float filledFraction;
 @end
@@ -138,6 +140,10 @@
         progress = progress >= 0.0f ? progress : 0.0f;
         progress = progress <= 1.0f ? progress : 1.0f;
     }
+    
+#if DEBUG_PULL_HEIGHT_PROGRESS
+    NSLog(@"Progress = %0.2f", progress);
+#endif
 
     self.circleView.filledFraction = progress;
 }
@@ -178,7 +184,15 @@ static void CommonInit(MUKCirclePullToRefreshControl *__nonnull me) {
 - (void)insertActivityIndicatorViewIfNeededAlignedWithCircleView:(MUKCirclePullToRefreshControlCircleView *__nonnull)circleView
 {
     if (!self.activityIndicatorView) {
-        UIActivityIndicatorView *view = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        UIActivityIndicatorView *view;
+        if (@available(iOS 13, *)) {
+            view = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+            view.color = UIColor.systemGray2Color;
+        }
+        else {
+            view = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        }
+        
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [self.contentView addSubview:view];
         self.activityIndicatorView = view;

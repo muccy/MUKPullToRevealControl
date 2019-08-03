@@ -1,21 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
-   <FileRef
-      location = "group:../MUKPullToRevealControl.podspec">
-   </FileRef>
-   <FileRef
-      location = "group:../Classes/MUKPullToRevealControl.h">
-   </FileRef>
-   <FileRef
-      location = "group:../Classes/MUKPullToRevealControl.m">
-   </FileRef>
-   <FileRef
-      location = "group:../Classes/MUKCirclePullToRefreshControl.h">
-   </FileRef>
-   <FileRef
-      location = "group:../Classes/MUKCirclePullToRefreshControl.m">
-   </FileRef>
+   <Group
+      location = "group:../Classes"
+      name = "Classes">
+      <FileRef
+         location = "group:MUKPullToRevealControl.h">
+      </FileRef>
+      <FileRef
+         location = "group:MUKPullToRevealControl.m">
+      </FileRef>
+      <Group
+         location = "group:Circle"
+         name = "Circle">
+         <FileRef
+            location = "group:MUKCirclePullToRefreshControl.m">
+         </FileRef>
+         <FileRef
+            location = "group:MUKCirclePullToRefreshControl.h">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Insertion"
+         name = "Insertion">
+         <FileRef
+            location = "group:MUKPullToRevealControlInsertion.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlInsertion.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Removal"
+         name = "Removal">
+         <FileRef
+            location = "group:MUKPullToRevealControlRemoval.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlRemoval.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Layouter"
+         name = "Layouter">
+         <Group
+            location = "group:Content Inset"
+            name = "Content Inset">
+            <FileRef
+               location = "group:MUKPullToRevealControlContentInsetLayouter.h">
+            </FileRef>
+            <FileRef
+               location = "group:MUKPullToRevealControlContentInsetLayouter.m">
+            </FileRef>
+         </Group>
+         <Group
+            location = "group:Frame"
+            name = "Frame">
+            <FileRef
+               location = "group:MUKPullToRevealControlFrameLayouter.h">
+            </FileRef>
+            <FileRef
+               location = "group:MUKPullToRevealControlFrameLayouter.m">
+            </FileRef>
+         </Group>
+         <Group
+            location = "group:Touches Tracker"
+            name = "Touches Tracker">
+            <FileRef
+               location = "group:MUKPullToRevealControlTouchesTracker.h">
+            </FileRef>
+            <FileRef
+               location = "group:MUKPullToRevealControlTouchesTracker.m">
+            </FileRef>
+         </Group>
+         <FileRef
+            location = "group:MUKPullToRevealControlLayouter.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlLayouter.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Reveal"
+         name = "Reveal">
+         <FileRef
+            location = "group:MUKPullToRevealControlRevealTransition.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlRevealTransition.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Cover"
+         name = "Cover">
+         <FileRef
+            location = "group:MUKPullToRevealControlCoverTransition.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlCoverTransition.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Scroll"
+         name = "Scroll">
+         <Group
+            location = "group:Runner"
+            name = "Runner">
+            <FileRef
+               location = "group:MUKPullToRevealControlScrollRunner.h">
+            </FileRef>
+            <FileRef
+               location = "group:MUKPullToRevealControlScrollRunner.m">
+            </FileRef>
+         </Group>
+         <FileRef
+            location = "group:MUKPullToRevealControlScroll.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlScroll.m">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:Scroll View Observer"
+         name = "Scroll View Observer">
+         <FileRef
+            location = "group:MUKPullToRevealControlScrollViewObserver.h">
+         </FileRef>
+         <FileRef
+            location = "group:MUKPullToRevealControlScrollViewObserver.m">
+         </FileRef>
+      </Group>
+   </Group>
    <FileRef
       location = "group:MUKPullToRevealControl.xcodeproj">
    </FileRef>
