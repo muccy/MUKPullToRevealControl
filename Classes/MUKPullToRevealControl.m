@@ -9,10 +9,7 @@
 
 @interface MUKPullToRevealControl () <MUKPullToRevealControlLayouterDelegate, MUKPullToRevealControlRevealTransitionDelegate, MUKPullToRevealControlCoverTransitionDelegate>
 @property (nonatomic, readwrite) MUKPullToRevealControlState revealState;
-
-
 @property (nonatomic, copy) dispatch_block_t jobAfterUserTouch;
-
 @property (nonatomic, nullable) MUKPullToRevealControlLayouter *layouter;
 @end
 

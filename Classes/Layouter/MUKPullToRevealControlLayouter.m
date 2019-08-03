@@ -37,7 +37,9 @@
 #pragma mark - Methods
 
 - (void)start {
+    self.frameLayouter.delegate = self;
     [self.frameLayouter start];
+    
     self.control.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     
     self.touchesTracker.delegate = self;
@@ -51,7 +53,9 @@
 
 - (void)stop {
     [self.insetLayouter stop];
+    
     [self.frameLayouter stop];
+    self.frameLayouter.delegate = nil;
     
     [self.touchesTracker stop];
     self.touchesTracker.delegate = nil;

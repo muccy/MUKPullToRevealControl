@@ -11,6 +11,16 @@
          location = "group:MUKPullToRevealControl.m">
       </FileRef>
       <Group
+         location = "group:Circle"
+         name = "Circle">
+         <FileRef
+            location = "group:MUKCirclePullToRefreshControl.m">
+         </FileRef>
+         <FileRef
+            location = "group:MUKCirclePullToRefreshControl.h">
+         </FileRef>
+      </Group>
+      <Group
          location = "group:Insertion"
          name = "Insertion">
          <FileRef
@@ -118,16 +128,6 @@
          </FileRef>
          <FileRef
             location = "group:MUKPullToRevealControlScrollViewObserver.m">
-         </FileRef>
-      </Group>
-      <Group
-         location = "group:Circle"
-         name = "Circle">
-         <FileRef
-            location = "group:MUKCirclePullToRefreshControl.m">
-         </FileRef>
-         <FileRef
-            location = "group:MUKCirclePullToRefreshControl.h">
          </FileRef>
       </Group>
    </Group>

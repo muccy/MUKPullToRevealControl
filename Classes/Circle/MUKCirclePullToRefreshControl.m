@@ -1,5 +1,7 @@
 #import "MUKCirclePullToRefreshControl.h"
 
+#define DEBUG_PULL_HEIGHT_PROGRESS  0
+
 @interface MUKCirclePullToRefreshControlCircleView : UIView
 @property (nonatomic) float filledFraction;
 @end
@@ -138,6 +140,10 @@
         progress = progress >= 0.0f ? progress : 0.0f;
         progress = progress <= 1.0f ? progress : 1.0f;
     }
+    
+#if DEBUG_PULL_HEIGHT_PROGRESS
+    NSLog(@"Progress = %0.2f", progress);
+#endif
 
     self.circleView.filledFraction = progress;
 }
