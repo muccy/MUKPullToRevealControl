@@ -27,7 +27,7 @@
         _insetLayouter = [[MUKPullToRevealControlContentInsetLayouter alloc] initWithScrollView:scrollView control:control];
         _frameLayouter = [[MUKPullToRevealControlFrameLayouter alloc] initWithScrollView:scrollView control:control];
         _touchesTracker = [[MUKPullToRevealControlTouchesTracker alloc] initWithScrollView:scrollView];
-        _observer = [[MUKPullToRevealControlScrollViewObserver alloc] initWithScrollView:scrollView];
+        _observer = [[MUKPullToRevealControlScrollViewObserver alloc] initWithDelegate:self];
         _scrollRunner = [[MUKPullToRevealControlScrollRunner alloc] initWithScrollView:scrollView];
     }
     
@@ -47,7 +47,6 @@
     
     [self.insetLayouter start];
     
-    self.observer.delegate = self;
     [self.observer start];
 }
 
@@ -61,7 +60,6 @@
     self.touchesTracker.delegate = nil;
     
     [self.observer stop];
-    self.observer.delegate = nil;
 }
 
 #pragma mark - Private
@@ -117,6 +115,20 @@
 }
 
 #pragma mark - <MUKPullToRevealControlScrollViewObserverDelegate>
+
+- (UIScrollView *)scrollViewForScrollViewObserver:(MUKPullToRevealControlScrollViewObserver *)observer {
+    // Do everything you can to return a valid scroll view, also during -dealloc of view hierarchy
+    
+    if (self.scrollView) {
+        return self.scrollView;
+    }
+    else if ([self.control.superview isKindOfClass:UIScrollView.class]) {
+        return (UIScrollView *)self.control.superview;
+    }
+    else {
+        return nil;
+    }
+}
 
 - (void)scrollViewObserver:(MUKPullToRevealControlScrollViewObserver *)observer didObserveNewContentOffset:(CGPoint)newOffset
 {

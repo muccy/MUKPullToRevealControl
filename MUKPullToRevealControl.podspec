@@ -20,5 +20,5 @@ Pod::Spec.new do |s|
   s.public_header_files = 'Classes/MUKPullToRevealControl.h', 'Classes/Circle/*.h'
   s.compiler_flags  = '-Wdocumentation'
   
-  s.dependency  'MUKSignal', '~> 1.0.5'
+  s.dependency  'MUKSignal', '~> 1.1.0'
 end
