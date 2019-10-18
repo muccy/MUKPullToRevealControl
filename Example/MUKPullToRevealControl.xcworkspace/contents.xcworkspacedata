@@ -31,16 +31,6 @@
          </FileRef>
       </Group>
       <Group
-         location = "group:Removal"
-         name = "Removal">
-         <FileRef
-            location = "group:MUKPullToRevealControlRemoval.h">
-         </FileRef>
-         <FileRef
-            location = "group:MUKPullToRevealControlRemoval.m">
-         </FileRef>
-      </Group>
-      <Group
          location = "group:Layouter"
          name = "Layouter">
          <Group

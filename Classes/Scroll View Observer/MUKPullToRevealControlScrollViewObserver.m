@@ -8,52 +8,76 @@
 #import "MUKPullToRevealControlScrollViewObserver.h"
 #import <MUKSignal/MUKSignal.h>
 
+static void *const kKVOContext = (void *)&kKVOContext;
+
 @interface MUKPullToRevealControlScrollViewObserver ()
-@property (nonatomic, readwrite, nullable) MUKSignalObservation<MUKKVOSignal *> *contentInsetObservation, *contentOffsetObservation;
+@property (nonatomic) BOOL isObserving;
+@property (nonatomic, readonly, nullable) UIScrollView *scrollView;
 @end
 
 @implementation MUKPullToRevealControlScrollViewObserver
+@dynamic scrollView;
 
 - (void)dealloc {
     [self stop];
 }
 
-- (instancetype)initWithScrollView:(UIScrollView *)scrollView {
+- (instancetype)initWithDelegate:(id<MUKPullToRevealControlScrollViewObserverDelegate>)delegate {
     self = [super init];
     if (self) {
-        _scrollView = scrollView;
+        _delegate = delegate;
     }
     
     return self;
 }
 
+#pragma mark - Accessors
+
+- (UIScrollView *)scrollView {
+    return [self.delegate scrollViewForScrollViewObserver:self];
+}
+
 #pragma mark - Methods
 
 - (void)start {
-    [self startObservingContentInset];
-    [self startObservingContentOffset];
+    if (!self.isObserving) {
+        [self.scrollView addObserver:self forKeyPath:NSStringFromSelector(@selector(contentInset)) options:NSKeyValueObservingOptionNew context:kKVOContext];
+        [self.scrollView addObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew context:kKVOContext];
+        self.isObserving = YES;
+    }
 }
 
 - (void)stop {
-    self.contentInsetObservation = nil;
-    self.contentOffsetObservation = nil;
+    if (self.isObserving) {
+        [self.scrollView removeObserver:self forKeyPath:NSStringFromSelector(@selector(contentInset)) context:kKVOContext];
+        [self.scrollView removeObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) context:kKVOContext];
+        self.isObserving = NO;
+    }
+}
+
+#pragma mark - KVO
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if (context != &kKVOContext) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+
+    if (object == self.scrollView) {
+        if ([keyPath isEqualToString:NSStringFromSelector(@selector(contentInset))]) {
+            [self didChangeContentInset];
+        }
+        else if ([keyPath isEqualToString:NSStringFromSelector(@selector(contentOffset))]) {
+            [self didChangeContentOffset];
+        }
+    }
 }
 
 #pragma mark - Private — Observations
 
-- (void)startObservingContentInset {
-    MUKKVOSignal *const signal = [[MUKKVOSignal alloc] initWithObject:self.scrollView keyPath:NSStringFromSelector(@selector(contentInset))];
-    self.contentInsetObservation = [MUKSignalObservation observationWithSignal:signal token:[signal subscribeWithTarget:self action:@selector(didChangeContentInset:)]];
-}
-
-- (void)startObservingContentOffset {
-    MUKKVOSignal *const signal = [[MUKKVOSignal alloc] initWithObject:self.scrollView keyPath:NSStringFromSelector(@selector(contentOffset))];
-    self.contentOffsetObservation = [MUKSignalObservation observationWithSignal:signal token:[signal subscribeWithTarget:self action:@selector(didChangeContentOffset:)]];
-}
-
-- (void)didChangeContentInset:(nonnull MUKKVOSignalChange<NSNumber *> *)change
-{
-    UIEdgeInsets const newInset = change.value.UIEdgeInsetsValue;
+- (void)didChangeContentInset {
+    UIEdgeInsets const newInset = self.scrollView.contentInset;
             
     if (self.loggingEnabled) {
         NSLog(@"New inset = %@", NSStringFromUIEdgeInsets(newInset));
@@ -62,9 +86,8 @@
     [self.delegate scrollViewObserver:self didObserveNewContentInset:newInset];
 }
 
-- (void)didChangeContentOffset:(nonnull MUKKVOSignalChange<NSNumber *> *)change
-{
-    CGPoint const newOffset = change.value.CGPointValue;
+- (void)didChangeContentOffset {
+    CGPoint const newOffset = self.scrollView.contentOffset;
     
     if (self.loggingEnabled) {
         NSLog(@"New offset = %@", NSStringFromCGPoint(newOffset));

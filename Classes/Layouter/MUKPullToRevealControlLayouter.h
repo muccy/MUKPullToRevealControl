@@ -35,7 +35,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithScrollView:(UIScrollView *)scrollView control:(MUKPullToRevealControl *)control NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 
+/// Starts layout and observations
 - (void)start;
+/// Stop layout and observations
+/// @warning You must call this method if you have called -start before! It is important due KVO observations
 - (void)stop;
 @end
 
