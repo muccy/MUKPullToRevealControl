@@ -1,6 +1,5 @@
 #import "MUKPullToRevealControl.h"
 #import "MUKPullToRevealControlInsertion.h"
-#import "MUKPullToRevealControlRemoval.h"
 #import "MUKPullToRevealControlRevealTransition.h"
 #import "MUKPullToRevealControlCoverTransition.h"
 
@@ -42,16 +41,15 @@
     MUKPullToRevealControlInsertion *const insertion = [[MUKPullToRevealControlInsertion alloc] initWithControl:self superview:newSuperview];
     
     if (insertion.canStart) {
+        [self.layouter stop];
         self.layouter = [insertion start];
         self.layouter.delegate = self;
         [self.layouter start];
     }
     else {
-        MUKPullToRevealControlRemoval *const removal = [[MUKPullToRevealControlRemoval alloc] initWithSuperview:newSuperview layouter:self.layouter];
-        if (removal.canStart) {
-            [removal start];
-            self.layouter = nil;
-        }
+        // Remove
+        [self.layouter stop]; // it should be safe to perform -stop here, since view hierarchy should be consistent also in -dealloc context
+        self.layouter = nil;
     }
 }
 
